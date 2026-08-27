@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="SKP.OS.Backend/SKP.OS.Backend.csproj" />
+  <Project Path="SKP.OS.Base/SKP.OS.Base.csproj" />
 </Solution>
