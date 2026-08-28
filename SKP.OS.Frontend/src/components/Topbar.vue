@@ -52,7 +52,7 @@ const emit = defineEmits<{
   justify-content: center;
   width: 32px;
   height: 32px;
-  margin-left: 258px;
+  margin-left: 240px;
   border-radius: 10px;
   background-color: #f8fafc;
   border: none;
@@ -70,7 +70,7 @@ const emit = defineEmits<{
 }
 
 .collapse-toggle-btn.sidebar-collapsed {
-  margin-left: 80px;
+  margin-left: 65px;
 }
 
 .collapse-toggle-btn:hover {

@@ -9,7 +9,8 @@ import {
   IconMapPin, 
   IconInbox, 
   IconInfoCircle, 
-  IconHelpCircle 
+  IconHelpCircle,
+  IconSettings
 } from '@tabler/icons-vue'
 
 const isCollapsed = defineModel<boolean>('collapsed', { default: false })
@@ -28,8 +29,7 @@ const tabs = [
 ]
 
 const activeIndex = computed(() => {
-  const index = tabs.findIndex(tab => tab.id === activeTab.value)
-  return index !== -1 ? index : 0
+  return tabs.findIndex(tab => tab.id === activeTab.value)
 })
 </script>
 
@@ -42,7 +42,10 @@ const activeIndex = computed(() => {
     <nav class="tabs-list">
       <div 
         class="active-indicator" 
-        :style="{ transform: `translateY(${activeIndex * 50}px)` }"
+        :style="{ 
+          transform: `translateY(${activeIndex !== -1 ? activeIndex * 50 : 0}px)`,
+          opacity: activeIndex !== -1 ? 1 : 0
+        }"
       />
 
       <button
@@ -58,6 +61,19 @@ const activeIndex = computed(() => {
         <span class="tab-label">{{ tab.name }}</span>
       </button>
     </nav>
+
+    <div class="sidebar-footer">
+      <button
+        class="tab-item settings-tab"
+        :class="{ active: activeTab === 'indstillinger' }"
+        :title="isCollapsed ? 'Indstillinger' : undefined"
+        aria-label="Indstillinger"
+        @click="activeTab = 'indstillinger'"
+      >
+        <IconSettings :size="20" :stroke-width="2" class="tab-icon" />
+        <span class="tab-label">Indstillinger</span>
+      </button>
+    </div>
   </aside>
 </template>
 
@@ -141,7 +157,7 @@ const activeIndex = computed(() => {
   border-radius: 14px;
   pointer-events: none;
   z-index: 1;
-  transition: transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1);
+  transition: transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1), opacity 0.2s ease;
 }
 
 .tab-item {
@@ -173,7 +189,6 @@ const activeIndex = computed(() => {
 }
 
 .sidebar.collapsed .tab-item {
-  padding: 0 16px;
   gap: 0;
 }
 
@@ -188,6 +203,10 @@ const activeIndex = computed(() => {
 
 .tab-item.active {
   color: #ffffff;
+}
+
+.settings-tab.active {
+  background-color: #016BFF;
 }
 
 .tab-icon {
@@ -210,5 +229,12 @@ const activeIndex = computed(() => {
 .sidebar.collapsed .tab-label {
   max-width: 0;
   opacity: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 </style>
