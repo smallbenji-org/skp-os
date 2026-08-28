@@ -19,6 +19,8 @@ public class ProjectController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists all projects.</summary>
+    /// <remarks>Returns every project (with its template) ordered by title. Requires: authenticated user.</remarks>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -29,6 +31,12 @@ public class ProjectController : ControllerBase
         return Ok(projects.Select(p => new ProjectDto(p)));
     }
 
+    /// <summary>Gets a single project by id.</summary>
+    /// <remarks>
+    /// Returns the project including its template and assigned students.
+    /// <para>Returns 404 if the project does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -48,6 +56,12 @@ public class ProjectController : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>Creates a new project.</summary>
+    /// <remarks>
+    /// <c>projectTemplateId</c> is required for non-custom projects and must reference an
+    /// existing project template.
+    /// <para>Returns 400 if the project template is missing or does not exist.</para>
+    /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProjectDto dto)
     {
@@ -81,6 +95,12 @@ public class ProjectController : ControllerBase
         return Ok(new ProjectDto(project));
     }
 
+    /// <summary>Updates an existing project.</summary>
+    /// <remarks>
+    /// Updates all editable project fields. Passing <c>projectTemplateId</c> requires an existing template.
+    /// <para>Returns 404 if the project does not exist, 400 if the template does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProjectDto dto)
     {
@@ -115,6 +135,9 @@ public class ProjectController : ControllerBase
         return Ok(new ProjectDto(project));
     }
 
+    /// <summary>Deletes a project.</summary>
+    /// <remarks>Returns 404 if the project does not exist, otherwise 204 on success.</remarks>
+    /// <param name="id">The id of the project.</param>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -130,6 +153,13 @@ public class ProjectController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Assigns a student to a project.</summary>
+    /// <remarks>
+    /// Links the given student profile to the project.
+    /// <para>Returns 409 if already assigned, 404 if the project or student does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
+    /// <param name="studentId">The id of the student profile.</param>
     [HttpPost("{id:int}/students/{studentId:int}")]
     public async Task<IActionResult> AddStudent(int id, int studentId)
     {
@@ -160,6 +190,13 @@ public class ProjectController : ControllerBase
         return Ok(new ProjectDto(project));
     }
 
+    /// <summary>Removes a student from a project.</summary>
+    /// <remarks>
+    /// Unlinks the student profile from the project.
+    /// <para>Returns 404 if the project or the assignment does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
+    /// <param name="studentId">The id of the student profile.</param>
     [HttpDelete("{id:int}/students/{studentId:int}")]
     public async Task<IActionResult> RemoveStudent(int id, int studentId)
     {

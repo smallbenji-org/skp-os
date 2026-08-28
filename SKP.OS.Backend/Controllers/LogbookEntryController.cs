@@ -19,6 +19,12 @@ public class LogbookEntryController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists logbook entries, optionally filtered by student.</summary>
+    /// <remarks>
+    /// If <c>studentProfileId</c> is provided, only entries for that student are returned.
+    /// Entries are ordered newest first. Requires: authenticated user.
+    /// </remarks>
+    /// <param name="studentProfileId">Optional. Filter to a single student profile.</param>
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int? studentProfileId = null)
     {
@@ -33,6 +39,9 @@ public class LogbookEntryController : ControllerBase
         return Ok(entries.Select(l => new LogbookEntryDto(l)));
     }
 
+    /// <summary>Gets a single logbook entry by id.</summary>
+    /// <remarks>Returns 404 if the entry does not exist.</remarks>
+    /// <param name="id">The id of the logbook entry.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -45,6 +54,11 @@ public class LogbookEntryController : ControllerBase
         return Ok(new LogbookEntryDto(entry));
     }
 
+    /// <summary>Creates a new logbook entry.</summary>
+    /// <remarks>
+    /// Requires the referenced student profile to exist.
+    /// <para>Returns 400 if the student profile does not exist.</para>
+    /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateLogbookEntryDto dto)
     {
@@ -68,6 +82,11 @@ public class LogbookEntryController : ControllerBase
         return Ok(new LogbookEntryDto(entry));
     }
 
+    /// <summary>Updates an existing logbook entry.</summary>
+    /// <remarks>
+    /// <para>Returns 404 if the entry does not exist, 400 if the student profile does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the logbook entry.</param>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateLogbookEntryDto dto)
     {
@@ -94,6 +113,9 @@ public class LogbookEntryController : ControllerBase
         return Ok(new LogbookEntryDto(entry));
     }
 
+    /// <summary>Deletes a logbook entry.</summary>
+    /// <remarks>Returns 404 if the entry does not exist, otherwise 204 on success.</remarks>
+    /// <param name="id">The id of the logbook entry.</param>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

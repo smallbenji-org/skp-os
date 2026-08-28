@@ -19,6 +19,13 @@ public class CheckInController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists check-ins, optionally filtered by student and/or room.</summary>
+    /// <remarks>
+    /// Filters by <c>studentProfileId</c> and/or <c>roomId</c> when provided.
+    /// Check-ins are ordered newest first. Requires: authenticated user.
+    /// </remarks>
+    /// <param name="studentProfileId">Optional. Filter to a single student profile.</param>
+    /// <param name="roomId">Optional. Filter to a single room.</param>
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int? studentProfileId = null, [FromQuery] int? roomId = null)
     {
@@ -39,6 +46,9 @@ public class CheckInController : ControllerBase
         return Ok(checkIns.Select(c => new CheckInDto(c)));
     }
 
+    /// <summary>Gets a single check-in by id.</summary>
+    /// <remarks>Returns 404 if the check-in does not exist.</remarks>
+    /// <param name="id">The id of the check-in.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -52,6 +62,11 @@ public class CheckInController : ControllerBase
         return Ok(new CheckInDto(checkIn));
     }
 
+    /// <summary>Creates a new check-in.</summary>
+    /// <remarks>
+    /// Requires the referenced student profile and room to exist.
+    /// <para>Returns 400 if the student profile or room does not exist.</para>
+    /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCheckInDto dto)
     {
@@ -86,6 +101,11 @@ public class CheckInController : ControllerBase
         return Ok(new CheckInDto(created));
     }
 
+    /// <summary>Updates an existing check-in.</summary>
+    /// <remarks>
+    /// <para>Returns 404 if the check-in does not exist, 400 if the room does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the check-in.</param>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCheckInDto dto)
     {
@@ -113,6 +133,9 @@ public class CheckInController : ControllerBase
         return Ok(new CheckInDto(checkIn));
     }
 
+    /// <summary>Deletes a check-in.</summary>
+    /// <remarks>Returns 404 if the check-in does not exist, otherwise 204 on success.</remarks>
+    /// <param name="id">The id of the check-in.</param>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

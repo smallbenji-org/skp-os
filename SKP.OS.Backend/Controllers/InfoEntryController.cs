@@ -19,6 +19,12 @@ public class InfoEntryController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists info entries, optionally filtered to pinned only.</summary>
+    /// <remarks>
+    /// If <c>pinned</c> is provided, only entries matching that pinned state are returned.
+    /// Entries are ordered pinned-first, then newest first. Requires: authenticated user.
+    /// </remarks>
+    /// <param name="pinned">Optional. Filter by pinned state.</param>
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] bool? pinned = null)
     {
@@ -34,6 +40,9 @@ public class InfoEntryController : ControllerBase
         return Ok(entries.Select(i => new InfoEntryDto(i)));
     }
 
+    /// <summary>Gets a single info entry by id.</summary>
+    /// <remarks>Returns 404 if the entry does not exist.</remarks>
+    /// <param name="id">The id of the info entry.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -46,6 +55,11 @@ public class InfoEntryController : ControllerBase
         return Ok(new InfoEntryDto(entry));
     }
 
+    /// <summary>Creates a new info entry.</summary>
+    /// <remarks>
+    /// Requires the referenced instructor profile to exist. The created timestamp is set automatically.
+    /// <para>Returns 400 if the instructor profile does not exist.</para>
+    /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInfoEntryDto dto)
     {
@@ -70,6 +84,11 @@ public class InfoEntryController : ControllerBase
         return Ok(new InfoEntryDto(entry));
     }
 
+    /// <summary>Updates an existing info entry.</summary>
+    /// <remarks>
+    /// <para>Returns 404 if the entry does not exist, 400 if the instructor profile does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the info entry.</param>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateInfoEntryDto dto)
     {
@@ -96,6 +115,9 @@ public class InfoEntryController : ControllerBase
         return Ok(new InfoEntryDto(entry));
     }
 
+    /// <summary>Deletes an info entry.</summary>
+    /// <remarks>Returns 404 if the entry does not exist, otherwise 204 on success.</remarks>
+    /// <param name="id">The id of the info entry.</param>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

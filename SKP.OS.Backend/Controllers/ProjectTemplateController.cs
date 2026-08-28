@@ -19,6 +19,8 @@ public class ProjectTemplateController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists all project templates.</summary>
+    /// <remarks>Returns every project template ordered by title. Requires: authenticated user.</remarks>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -28,6 +30,9 @@ public class ProjectTemplateController : ControllerBase
         return Ok(templates.Select(pt => new ProjectTemplateDto(pt)));
     }
 
+    /// <summary>Gets a single project template by id.</summary>
+    /// <remarks>Returns 404 if the template does not exist.</remarks>
+    /// <param name="id">The id of the project template.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -40,6 +45,12 @@ public class ProjectTemplateController : ControllerBase
         return Ok(new ProjectTemplateDto(template));
     }
 
+    /// <summary>Creates a new project template.</summary>
+    /// <remarks>
+    /// Requires the <c>instructorProfileId</c> to reference an existing instructor profile.
+    /// <para>Permissions: Instructor only.</para>
+    /// <para>Returns 400 if the instructor profile does not exist.</para>
+    /// </remarks>
     [HttpPost]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create([FromBody] CreateProjectTemplateDto dto)
@@ -66,6 +77,12 @@ public class ProjectTemplateController : ControllerBase
         return Ok(new ProjectTemplateDto(template));
     }
 
+    /// <summary>Updates an existing project template.</summary>
+    /// <remarks>
+    /// <para>Permissions: Instructor only.</para>
+    /// <para>Returns 404 if the template does not exist, 400 if the instructor profile does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project template.</param>
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProjectTemplateDto dto)
@@ -95,6 +112,12 @@ public class ProjectTemplateController : ControllerBase
         return Ok(new ProjectTemplateDto(template));
     }
 
+    /// <summary>Deletes a project template.</summary>
+    /// <remarks>
+    /// <para>Permissions: Instructor only.</para>
+    /// <para>Returns 404 if the template does not exist, otherwise 204 on success.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project template.</param>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Delete(int id)

@@ -30,6 +30,14 @@ public class AuthController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Registers a new user account.</summary>
+    /// <remarks>
+    /// Creates an <see cref="ApplicationUser"/> and assigns it the requested role
+    /// ("Student" by default, or "Instructor"). A matching student/instructor profile is
+    /// automatically created for the new user.
+    /// <para>Requires: anonymous.</para>
+    /// <para>Returns 200 with the created user, or 400 if validation fails.</para>
+    /// </remarks>
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -72,6 +80,13 @@ public class AuthController : ControllerBase
         return Ok(new UserDto(user));
     }
 
+    /// <summary>Signs an existing user in with username/email and password.</summary>
+    /// <remarks>
+    /// Authenticates the user via cookie-based sign-in. Accepts either a username or an email
+    /// in the <c>userName</c> field.
+    /// <para>Requires: anonymous.</para>
+    /// <para>Returns 200 with the user, or 401 if credentials are invalid.</para>
+    /// </remarks>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -96,6 +111,8 @@ public class AuthController : ControllerBase
         return Ok(new UserDto(user));
     }
 
+    /// <summary>Signs the current user out.</summary>
+    /// <remarks>Requires: authenticated user.</remarks>
     [HttpPost("logout")]
     [Authorize]
     public async Task<IActionResult> Logout()
@@ -104,6 +121,12 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
+    /// <summary>Returns basic information about the current authenticated user.</summary>
+    /// <remarks>
+    /// Returns the name and email of the currently signed-in user.
+    /// <para>Requires: authenticated user.</para>
+    /// <para>Returns 200 with the user's name/email, or 401 if not authenticated.</para>
+    /// </remarks>
     [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> Me()

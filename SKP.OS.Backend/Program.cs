@@ -62,7 +62,11 @@ builder.Services.AddMemoryCache();
 
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddOpenApi();
+    builder.Services.AddSingleton<XmlDocsOperationTransformer>();
+    builder.Services.AddOpenApi(options =>
+    {
+        options.AddOperationTransformer<XmlDocsOperationTransformer>();
+    });
 }
 
 var app = builder.Build();

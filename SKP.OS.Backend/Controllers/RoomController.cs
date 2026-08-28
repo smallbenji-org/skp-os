@@ -19,6 +19,8 @@ public class RoomController : ControllerBase
         _context = context;
     }
 
+    /// <summary>Lists all rooms.</summary>
+    /// <remarks>Returns every room ordered by name. Requires: authenticated user.</remarks>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -28,6 +30,9 @@ public class RoomController : ControllerBase
         return Ok(rooms.Select(r => new RoomDto(r)));
     }
 
+    /// <summary>Gets a single room by id.</summary>
+    /// <remarks>Returns 404 if the room does not exist.</remarks>
+    /// <param name="id">The id of the room.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -40,6 +45,8 @@ public class RoomController : ControllerBase
         return Ok(new RoomDto(room));
     }
 
+    /// <summary>Creates a new room.</summary>
+    /// <remarks>Permissions: Instructor only.</remarks>
     [HttpPost]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create([FromBody] CreateRoomDto dto)
@@ -55,6 +62,12 @@ public class RoomController : ControllerBase
         return Ok(new RoomDto(room));
     }
 
+    /// <summary>Updates an existing room.</summary>
+    /// <remarks>
+    /// <para>Permissions: Instructor only.</para>
+    /// <para>Returns 404 if the room does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the room.</param>
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateRoomDto dto)
@@ -73,6 +86,12 @@ public class RoomController : ControllerBase
         return Ok(new RoomDto(room));
     }
 
+    /// <summary>Deletes a room.</summary>
+    /// <remarks>
+    /// <para>Permissions: Instructor only.</para>
+    /// <para>Returns 404 if the room does not exist, otherwise 204 on success.</para>
+    /// </remarks>
+    /// <param name="id">The id of the room.</param>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Delete(int id)

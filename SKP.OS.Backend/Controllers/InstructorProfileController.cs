@@ -24,6 +24,8 @@ public class InstructorProfileController : ControllerBase
         _userManager = userManager;
     }
 
+    /// <summary>Lists all instructor profiles.</summary>
+    /// <remarks>Returns every instructor profile ordered by user name. Requires: authenticated user.</remarks>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -34,6 +36,12 @@ public class InstructorProfileController : ControllerBase
         return Ok(profiles.Select(ip => new InstructorProfileDto(ip)));
     }
 
+    /// <summary>Gets a single instructor profile by id.</summary>
+    /// <remarks>
+    /// Returns the profile including its assigned students.
+    /// <para>Returns 404 if the profile does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the instructor profile.</param>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
@@ -53,6 +61,11 @@ public class InstructorProfileController : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>Gets the instructor profile of the current user.</summary>
+    /// <remarks>
+    /// Returns the profile for the currently signed-in user, including assigned students.
+    /// <para>Returns 404 if the current user has no instructor profile.</para>
+    /// </remarks>
     [HttpGet("me")]
     public async Task<IActionResult> GetMe()
     {
@@ -78,6 +91,11 @@ public class InstructorProfileController : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>Creates a new instructor profile.</summary>
+    /// <remarks>
+    /// Requires the referenced user to exist. Only one profile is allowed per user.
+    /// <para>Returns 409 if a profile already exists for the user, 400 if the user does not exist.</para>
+    /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInstructorProfileDto dto)
     {
@@ -105,6 +123,9 @@ public class InstructorProfileController : ControllerBase
         return Ok(new InstructorProfileDto(profile));
     }
 
+    /// <summary>Deletes an instructor profile.</summary>
+    /// <remarks>Returns 404 if the profile does not exist, otherwise 204 on success.</remarks>
+    /// <param name="id">The id of the instructor profile.</param>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -120,6 +141,13 @@ public class InstructorProfileController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Assigns a student to an instructor.</summary>
+    /// <remarks>
+    /// Links the given student profile to the instructor profile.
+    /// <para>Returns 409 if already assigned, 404 if either profile does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the instructor profile.</param>
+    /// <param name="studentId">The id of the student profile.</param>
     [HttpPost("{id:int}/students/{studentId:int}")]
     public async Task<IActionResult> AddStudent(int id, int studentId)
     {
@@ -150,6 +178,13 @@ public class InstructorProfileController : ControllerBase
         return Ok(new InstructorProfileDto(profile));
     }
 
+    /// <summary>Removes a student from an instructor.</summary>
+    /// <remarks>
+    /// Unlinks the student profile from the instructor profile.
+    /// <para>Returns 404 if the instructor or the assignment does not exist.</para>
+    /// </remarks>
+    /// <param name="id">The id of the instructor profile.</param>
+    /// <param name="studentId">The id of the student profile.</param>
     [HttpDelete("{id:int}/students/{studentId:int}")]
     public async Task<IActionResult> RemoveStudent(int id, int studentId)
     {
