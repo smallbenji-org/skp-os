@@ -16,6 +16,7 @@ public class InstructorProfileDto
     public int Id { get; set; }
     public string ApplicationUserId { get; set; } = string.Empty;
     public UserDto? User { get; set; }
+    public List<StudentProfileDto> StudentProfiles { get; set; } = [];
 }
 
 public class CreateInstructorProfileDto

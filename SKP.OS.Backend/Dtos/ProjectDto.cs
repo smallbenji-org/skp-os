@@ -30,6 +30,7 @@ public class ProjectDto
     public bool IsCustomProject { get; set; }
     public int? ProjectTemplateId { get; set; }
     public ProjectTemplateDto? ProjectTemplate { get; set; }
+    public List<StudentProfileDto> Students { get; set; } = [];
 }
 
 public class CreateProjectDto

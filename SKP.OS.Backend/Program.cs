@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
+using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend;
 using SKP.OS.Base;
@@ -48,7 +49,7 @@ builder.Services
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/login";
-    options.LogoutPath = "logout";
+    options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/accessdenied";
 
     if (builder.Environment.IsDevelopment())
@@ -59,12 +60,23 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddMemoryCache();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddOpenApi();
+}
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
