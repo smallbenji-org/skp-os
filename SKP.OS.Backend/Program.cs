@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SKP.OS.Backend;
 using SKP.OS.Base;
 using SKP.OS.Base.Models;
 
@@ -8,20 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseStaticWebAssets();
 
+var settings = new Settings();
+builder.Configuration.GetSection("Database").Bind(settings);
+builder.Services.AddSingleton(settings);
+
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.NumberHandling =
-            System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString |
-            System.Text.Json.Serialization.JsonNumberHandling.WriteAsString;
+            JsonNumberHandling.AllowReadingFromString |
+            JsonNumberHandling.WriteAsString;
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseNpgsql("");
+    options.UseNpgsql(settings.ConnectionString);
 });
 
 builder.Services
