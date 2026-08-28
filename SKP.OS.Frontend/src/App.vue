@@ -1,12 +1,22 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import Topbar from './components/Topbar.vue'
 import Sidebar from './components/Sidebar.vue'
+
+const isSidebarCollapsed = ref(false)
+
+const toggleSidebar = () => {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value
+}
 </script>
 
 <template>
   <main class="main-page">
-    <Sidebar />
-    <Topbar />
+    <Sidebar v-model:collapsed="isSidebarCollapsed" />
+    <Topbar
+      :is-sidebar-collapsed="isSidebarCollapsed"
+      @toggle-sidebar="toggleSidebar"
+    />
   </main>
 </template>
 
