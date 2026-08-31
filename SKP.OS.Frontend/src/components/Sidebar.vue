@@ -262,6 +262,7 @@ onUnmounted(() => {
 .sidebar.collapsed .tab-item {
   padding: 0 16px;
   gap: 0;
+  justify-content: center;
 }
 
 .tab-item:hover:not(.active) {
@@ -279,6 +280,7 @@ onUnmounted(() => {
 
 .tab-icon {
   flex-shrink: 0;
+  margin-top: 1.5px;
   transition: transform 0.3s cubic-bezier(0.34, 1.5, 0.64, 1);
 }
 
