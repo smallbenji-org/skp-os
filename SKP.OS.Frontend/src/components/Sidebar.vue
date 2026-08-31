@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { 
   IconHome, 
   IconFolderOpen, 
@@ -28,29 +28,89 @@ const tabs = [
   { id: 'hjaelp', name: 'Hjælp', icon: IconHelpCircle },
 ]
 
-const activeIndex = computed(() => {
-  return tabs.findIndex(tab => tab.id === activeTab.value)
+const sidebarRef = ref<HTMLElement | null>(null)
+const tabRefs = new Map<string, HTMLElement>()
+const indicatorTop = ref(0)
+const hasInitialized = ref(false)
+
+const setTabRef = (id: string, el: any) => {
+  if (el) {
+    tabRefs.set(id, el as HTMLElement)
+  } else {
+    tabRefs.delete(id)
+  }
+}
+
+const updateIndicator = () => {
+  const activeEl = tabRefs.get(activeTab.value)
+  const sidebarEl = sidebarRef.value
+  if (activeEl && sidebarEl) {
+    const sidebarRect = sidebarEl.getBoundingClientRect()
+    const activeRect = activeEl.getBoundingClientRect()
+    indicatorTop.value = activeRect.top - sidebarRect.top
+  }
+}
+
+watch(activeTab, () => {
+  nextTick(() => {
+    updateIndicator()
+  })
+})
+
+watch(isCollapsed, () => {
+  nextTick(() => {
+    updateIndicator()
+  })
+})
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  updateIndicator()
+  window.addEventListener('resize', updateIndicator)
+
+  if (sidebarRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      updateIndicator()
+    })
+    resizeObserver.observe(sidebarRef.value)
+  }
+
+  requestAnimationFrame(() => {
+    hasInitialized.value = true
+  })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateIndicator)
+  resizeObserver?.disconnect()
 })
 </script>
 
 <template>
-  <aside class="sidebar" :class="{ collapsed: isCollapsed }" aria-label="Sidebar">
+  <aside 
+    ref="sidebarRef" 
+    class="sidebar" 
+    :class="{ collapsed: isCollapsed }" 
+    aria-label="Sidebar"
+  >
     <div class="sidebar-header">
       <h1 class="sidebar-title">SKP OS</h1>
     </div>
 
-    <nav class="tabs-list">
-      <div 
-        class="active-indicator" 
-        :style="{ 
-          transform: `translateY(${activeIndex !== -1 ? activeIndex * 50 : 0}px)`,
-          opacity: activeIndex !== -1 ? 1 : 0
-        }"
-      />
+    <div 
+      class="active-indicator" 
+      :class="{ animated: hasInitialized }"
+      :style="{ 
+        transform: `translateY(${indicatorTop}px)`
+      }"
+    />
 
+    <nav class="tabs-list">
       <button
         v-for="tab in tabs"
         :key="tab.id"
+        :ref="(el) => setTabRef(tab.id, el)"
         class="tab-item"
         :class="{ active: activeTab === tab.id }"
         :title="isCollapsed ? tab.name : undefined"
@@ -64,7 +124,8 @@ const activeIndex = computed(() => {
 
     <div class="sidebar-footer">
       <button
-        class="tab-item settings-tab"
+        :ref="(el) => setTabRef('indstillinger', el)"
+        class="tab-item"
         :class="{ active: activeTab === 'indstillinger' }"
         :title="isCollapsed ? 'Indstillinger' : undefined"
         aria-label="Indstillinger"
@@ -139,25 +200,35 @@ const activeIndex = computed(() => {
   opacity: 0;
 }
 
-.tabs-list {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
 .active-indicator {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: 14px;
+  right: 14px;
   height: 44px;
   background: #016BFF;
   border-radius: 14px;
   pointer-events: none;
   z-index: 1;
-  transition: transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1), opacity 0.2s ease;
+}
+
+.active-indicator.animated {
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1),
+    left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed .active-indicator {
+  left: 10px;
+  right: 10px;
+}
+
+.tabs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
 
 .tab-item {
@@ -189,6 +260,7 @@ const activeIndex = computed(() => {
 }
 
 .sidebar.collapsed .tab-item {
+  padding: 0 16px;
   gap: 0;
 }
 
@@ -203,10 +275,6 @@ const activeIndex = computed(() => {
 
 .tab-item.active {
   color: #ffffff;
-}
-
-.settings-tab.active {
-  background-color: #016BFF;
 }
 
 .tab-icon {
