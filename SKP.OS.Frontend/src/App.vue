@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue'
 import Topbar from './components/Topbar.vue'
 import Sidebar from './components/Sidebar.vue'
+import { useAuth } from './composables/useAuth'
+
+const { loadUser } = useAuth()
+loadUser()
 
 import HomeView from './views/HomeView.vue'
 import ProjectsView from './views/ProjectsView.vue'

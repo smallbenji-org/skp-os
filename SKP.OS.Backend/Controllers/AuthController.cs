@@ -107,7 +107,6 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid username or password." });
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
         return Ok(new UserDto(user));
     }
 
@@ -121,11 +120,11 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
-    /// <summary>Returns basic information about the current authenticated user.</summary>
+    /// <summary>Returns basic information about the current authenticated user, including their roles.</summary>
     /// <remarks>
-    /// Returns the name and email of the currently signed-in user.
+    /// Returns the name, email and roles of the currently signed-in user.
     /// <para>Requires: authenticated user.</para>
-    /// <para>Returns 200 with the user's name/email, or 401 if not authenticated.</para>
+    /// <para>Returns 200 with the user's name/email/roles, or 401 if not authenticated.</para>
     /// </remarks>
     [HttpGet("me")]
     [Authorize]
@@ -137,6 +136,32 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "User not found." });
         }
 
-        return Ok(new MeDto { Name = user.Name ?? string.Empty, Email = user.Email ?? string.Empty });
+        var roles = await _userManager.GetRolesAsync(user);
+        return Ok(new MeDto
+        {
+            Name = user.Name ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            Roles = roles.ToList()
+        });
+    }
+
+    /// <summary>Returns the roles of the current authenticated user.</summary>
+    /// <remarks>
+    /// Returns the roles assigned to the currently signed-in user (e.g. "Student", "Instructor").
+    /// <para>Requires: authenticated user.</para>
+    /// <para>Returns 200 with the list of roles, or 401 if not authenticated.</para>
+    /// </remarks>
+    [HttpGet("roles")]
+    [Authorize]
+    public async Task<IActionResult> Roles()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return Ok(new RolesDto { Roles = roles.ToList() });
     }
 }

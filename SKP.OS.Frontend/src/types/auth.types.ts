@@ -14,4 +14,9 @@ export interface LoginDto {
 export interface MeDto {
     name: string;
     email: string;
+    roles: string[];
+}
+
+export interface RolesDto {
+    roles: string[];
 }
