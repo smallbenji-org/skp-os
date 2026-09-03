@@ -99,10 +99,9 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
 });
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseStaticFiles();
 
 app.MapControllerRoute(
     name: "default",
@@ -111,7 +110,7 @@ app.MapControllerRoute(
 
 app.MapFallback(async context =>
 {
-    var filePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "dist", "index.html");
+    var filePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "index.html");
     context.Response.ContentType = "text/html";
     await context.Response.SendFileAsync(filePath);
 }).RequireAuthorization();
