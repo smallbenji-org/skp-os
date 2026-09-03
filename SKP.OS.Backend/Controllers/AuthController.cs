@@ -113,7 +113,6 @@ public class AuthController : ControllerBase
     /// <summary>Signs the current user out.</summary>
     /// <remarks>Requires: authenticated user.</remarks>
     [HttpPost("logout")]
-    [Authorize]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
@@ -127,7 +126,6 @@ public class AuthController : ControllerBase
     /// <para>Returns 200 with the user's name/email/roles, or 401 if not authenticated.</para>
     /// </remarks>
     [HttpGet("me")]
-    [Authorize]
     public async Task<IActionResult> Me()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -152,7 +150,6 @@ public class AuthController : ControllerBase
     /// <para>Returns 200 with the list of roles, or 401 if not authenticated.</para>
     /// </remarks>
     [HttpGet("roles")]
-    [Authorize]
     public async Task<IActionResult> Roles()
     {
         var user = await _userManager.GetUserAsync(User);
