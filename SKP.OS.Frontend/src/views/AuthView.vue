@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, nextTick, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   IconUser,
   IconMail,
@@ -13,32 +14,21 @@ import {
 } from '@tabler/icons-vue'
 import { useAuthStore } from '@/Stores/AuthStore'
 
-const props = withDefaults(
-  defineProps<{
-    initialMode?: 'login' | 'register'
-  }>(),
-  {
-    initialMode: 'login',
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'success'): void
-}>()
+const route = useRoute()
+const router = useRouter()
 
 const authStore = useAuthStore()
 const loading = ref(false)
 
-const currentMode = ref<'login' | 'register'>(props.initialMode)
+const currentMode = computed<'login' | 'register'>(
+  () => (route.meta.authMode as 'login' | 'register') || 'login'
+)
 const showPassword = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
 const authContainerRef = ref<HTMLElement | null>(null)
-const loginPaneRef = ref<HTMLElement | null>(null)
-const registerPaneRef = ref<HTMLElement | null>(null)
 const containerHeight = ref<number | undefined>(undefined)
-const isTransitioning = ref(false)
 
 const loginForm = reactive({
   email: '',
@@ -51,15 +41,6 @@ const registerForm = reactive({
   password: '',
 })
 
-const measureTargetHeight = (mode: 'login' | 'register') => {
-  if (!authContainerRef.value) return undefined
-  const activePane = mode === 'login' ? loginPaneRef.value : registerPaneRef.value
-  const currentPane = currentMode.value === 'login' ? loginPaneRef.value : registerPaneRef.value
-  if (!activePane || !currentPane) return undefined
-  const diff = activePane.offsetHeight - currentPane.offsetHeight
-  return authContainerRef.value.offsetHeight + diff
-}
-
 const updateHeight = () => {
   if (authContainerRef.value) {
     containerHeight.value = authContainerRef.value.offsetHeight
@@ -67,34 +48,11 @@ const updateHeight = () => {
 }
 
 const switchMode = (mode: 'login' | 'register') => {
-  if (currentMode.value === mode || isTransitioning.value) return
+  if (currentMode.value === mode) return
   errorMessage.value = ''
   successMessage.value = ''
   showPassword.value = false
-
-  if (mode === 'register') {
-    const targetHeight = measureTargetHeight('register')
-    if (targetHeight) {
-      isTransitioning.value = true
-      containerHeight.value = targetHeight
-      setTimeout(() => {
-        currentMode.value = 'register'
-        isTransitioning.value = false
-      }, 350)
-      return
-    }
-  }
-
-  if (mode === 'login') {
-    const targetHeight = measureTargetHeight('login')
-    currentMode.value = 'login'
-    if (targetHeight) {
-      containerHeight.value = targetHeight
-    }
-    return
-  }
-
-  currentMode.value = mode
+  router.push({ name: mode })
 }
 
 watch(currentMode, () => {
@@ -135,7 +93,7 @@ const handleLogin = async () => {
     })
 
     if (user) {
-      emit('success')
+      router.push({ name: 'forside' })
     } else {
       errorMessage.value = 'Kunne ikke logge ind. Tjek dine oplysninger.'
     }
@@ -249,7 +207,6 @@ const handleRegister = async () => {
           :class="{ 'slide-register': currentMode === 'register' }"
         >
           <div 
-            ref="loginPaneRef" 
             class="form-pane" 
             :class="{ active: currentMode === 'login' }"
           >
@@ -316,7 +273,6 @@ const handleRegister = async () => {
           </div>
 
           <div 
-            ref="registerPaneRef" 
             class="form-pane" 
             :class="{ active: currentMode === 'register' }"
           >

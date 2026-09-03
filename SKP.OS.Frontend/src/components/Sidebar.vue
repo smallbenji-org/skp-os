@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { 
   IconHome, 
   IconFolderOpen, 
@@ -14,35 +15,38 @@ import {
 } from '@tabler/icons-vue'
 
 const isCollapsed = defineModel<boolean>('collapsed', { default: false })
-const activeTab = defineModel<string>('activeTab', { default: 'forside' })
+
+const route = useRoute()
 
 const tabs = [
-  { id: 'forside', name: 'Forside', icon: IconHome },
-  { id: 'projekter', name: 'Mine Projekter', icon: IconFolderOpen },
-  { id: 'skp-projekter', name: 'SKP Projekter', icon: IconNotes },
-  { id: 'logbog', name: 'Logbog', icon: IconEdit },
-  { id: 'ff', name: 'FF Timer', icon: IconClock },
-  { id: 'location', name: 'Tjek Ind', icon: IconMapPin },
-  { id: 'meddelelser', name: 'Aktuelle Meddelelser', icon: IconInbox },
-  { id: 'info', name: 'Information', icon: IconInfoCircle },
-  { id: 'hjaelp', name: 'Hjælp', icon: IconHelpCircle },
+  { name: 'forside', label: 'Forside', icon: IconHome },
+  { name: 'projekter', label: 'Mine Projekter', icon: IconFolderOpen },
+  { name: 'skp-projekter', label: 'SKP Projekter', icon: IconNotes },
+  { name: 'logbog', label: 'Logbog', icon: IconEdit },
+  { name: 'ff', label: 'FF Timer', icon: IconClock },
+  { name: 'location', label: 'Tjek Ind', icon: IconMapPin },
+  { name: 'meddelelser', label: 'Aktuelle Meddelelser', icon: IconInbox },
+  { name: 'info', label: 'Information', icon: IconInfoCircle },
+  { name: 'hjaelp', label: 'Hjælp', icon: IconHelpCircle },
 ]
+
+const activeName = computed(() => (route.name as string) || 'forside')
 
 const sidebarRef = ref<HTMLElement | null>(null)
 const tabRefs = new Map<string, HTMLElement>()
 const indicatorTop = ref(0)
 const hasInitialized = ref(false)
 
-const setTabRef = (id: string, el: any) => {
+const setTabRef = (name: string, el: any) => {
   if (el) {
-    tabRefs.set(id, el as HTMLElement)
+    tabRefs.set(name, el as HTMLElement)
   } else {
-    tabRefs.delete(id)
+    tabRefs.delete(name)
   }
 }
 
 const updateIndicator = () => {
-  const activeEl = tabRefs.get(activeTab.value)
+  const activeEl = tabRefs.get(activeName.value)
   const sidebarEl = sidebarRef.value
   if (activeEl && sidebarEl) {
     const sidebarRect = sidebarEl.getBoundingClientRect()
@@ -52,7 +56,7 @@ const updateIndicator = () => {
   }
 }
 
-watch(activeTab, () => {
+watch(activeName, () => {
   nextTick(() => {
     updateIndicator()
   })
@@ -108,33 +112,33 @@ onUnmounted(() => {
     />
 
     <nav class="tabs-list">
-      <button
+      <RouterLink
         v-for="tab in tabs"
-        :key="tab.id"
-        :ref="(el) => setTabRef(tab.id, el)"
+        :key="tab.name"
+        :ref="(el) => setTabRef(tab.name, el as any)"
+        :to="{ name: tab.name }"
         class="tab-item"
-        :class="{ active: activeTab === tab.id }"
-        :title="isCollapsed ? tab.name : undefined"
-        :aria-label="tab.name"
-        @click="activeTab = tab.id"
+        :class="{ active: activeName === tab.name }"
+        :title="isCollapsed ? tab.label : undefined"
+        :aria-label="tab.label"
       >
         <component :is="tab.icon" :size="20" :stroke-width="2" class="tab-icon" />
-        <span class="tab-label">{{ tab.name }}</span>
-      </button>
+        <span class="tab-label">{{ tab.label }}</span>
+      </RouterLink>
     </nav>
 
     <div class="sidebar-footer">
-      <button
-        :ref="(el) => setTabRef('indstillinger', el)"
+      <RouterLink
+        :ref="(el) => setTabRef('indstillinger', el as any)"
+        :to="{ name: 'indstillinger' }"
         class="tab-item"
-        :class="{ active: activeTab === 'indstillinger' }"
+        :class="{ active: activeName === 'indstillinger' }"
         :title="isCollapsed ? 'Indstillinger' : undefined"
         aria-label="Indstillinger"
-        @click="activeTab = 'indstillinger'"
       >
         <IconSettings :size="20" :stroke-width="2" class="tab-icon" />
         <span class="tab-label">Indstillinger</span>
-      </button>
+      </RouterLink>
     </div>
   </aside>
 </template>
@@ -252,6 +256,7 @@ onUnmounted(() => {
   text-align: left;
   font-family: inherit;
   user-select: none;
+  text-decoration: none;
   transition: 
     color 0.25s ease, 
     transform 0.15s ease, 
