@@ -9,7 +9,7 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
-COPY --from=node-build /src/SKP.OS.Frontend/dist /src/SKP.OS.Backend/wwwroot/dist
+COPY --from=node-build /src/SKP.OS.Frontend/dist /src/SKP.OS.Backend/wwwroot
 RUN dotnet restore SKP.OS.Backend/SKP.OS.Backend.csproj
 RUN dotnet publish SKP.OS.Backend/SKP.OS.Backend.csproj -c Release -o /app/publish
 
