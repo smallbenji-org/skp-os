@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { 
   IconHome, 
   IconFolderOpen, 
@@ -17,6 +17,8 @@ import {
 const isCollapsed = defineModel<boolean>('collapsed', { default: false })
 
 const route = useRoute()
+const router = useRouter()
+const indicatorVisible = ref(false)
 
 const tabs = [
   { name: 'forside', label: 'Forside', icon: IconHome },
@@ -39,7 +41,10 @@ const hasInitialized = ref(false)
 
 const setTabRef = (name: string, el: any) => {
   if (el) {
-    tabRefs.set(name, el as HTMLElement)
+    const domEl = el.$el ?? el
+    if (domEl instanceof HTMLElement) {
+      tabRefs.set(name, domEl)
+    }
   } else {
     tabRefs.delete(name)
   }
@@ -53,8 +58,12 @@ const updateIndicator = () => {
     const activeRect = activeEl.getBoundingClientRect()
     const borderTop = parseFloat(getComputedStyle(sidebarEl).borderTopWidth) || 0
     indicatorTop.value = activeRect.top - sidebarRect.top - borderTop
+    indicatorVisible.value = true
+  } else {
+    indicatorVisible.value = false
   }
 }
+
 
 watch(activeName, () => {
   nextTick(() => {
@@ -70,8 +79,15 @@ watch(isCollapsed, () => {
 
 let resizeObserver: ResizeObserver | null = null
 
-onMounted(() => {
+onMounted(async () => {
+  await router.isReady()
+  await nextTick()
   updateIndicator()
+
+  requestAnimationFrame(() => {
+    hasInitialized.value = true
+  })
+
   window.addEventListener('resize', updateIndicator)
 
   if (sidebarRef.value && typeof ResizeObserver !== 'undefined') {
@@ -80,10 +96,6 @@ onMounted(() => {
     })
     resizeObserver.observe(sidebarRef.value)
   }
-
-  requestAnimationFrame(() => {
-    hasInitialized.value = true
-  })
 })
 
 onUnmounted(() => {
@@ -104,12 +116,13 @@ onUnmounted(() => {
     </div>
 
     <div 
+      v-if="indicatorVisible"
       class="active-indicator" 
       :class="{ animated: hasInitialized }"
       :style="{ 
         transform: `translateY(${indicatorTop}px)`
       }"
-    />
+    /> 
 
     <nav class="tabs-list">
       <RouterLink
