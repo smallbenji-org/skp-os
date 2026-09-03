@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SKP.OS.Base.Models;
 
 namespace SKP.OS.Base;
@@ -37,7 +38,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 hauls => string.Join(',', hauls.Select(h => (int)h)),
                 value => value.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(v => (ProjectHaul)int.Parse(v))
-                    .ToList());
+                    .ToList())
+            .Metadata.SetValueComparer(
+                new ValueComparer<ICollection<ProjectHaul>>(
+                    (a, b) => a.SequenceEqual(b),
+                    c => c.Aggregate(0, (acc, v) => HashCode.Combine(acc, v.GetHashCode())),
+                    c => c.ToList()));
 
         builder.Entity<InstructorProfile>()
             .HasOne(ip => ip.User)
