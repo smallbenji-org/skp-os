@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAuth } from '../composables/useAuth'
+import { useAuthStore } from '@/Stores/AuthStore'
 
 const props = withDefaults(
   defineProps<{
@@ -15,19 +15,19 @@ const props = withDefaults(
   },
 )
 
-const { user, hasAnyRole, hasAllRoles } = useAuth()
+const authStore = useAuthStore()
 
 const allowed = computed(() => {
-  if (props.deny.length > 0 && hasAnyRole(props.deny)) {
+  if (props.deny.length > 0 && authStore.HAS_ANY_ROLE(props.deny)) {
     return false
   }
-  if (props.allow.length > 0 && !hasAllRoles(props.allow)) {
+  if (props.allow.length > 0 && !authStore.HAS_ALL_ROLES(props.allow)) {
     return false
   }
-  if (props.any.length > 0 && !hasAnyRole(props.any)) {
+  if (props.any.length > 0 && !authStore.HAS_ANY_ROLE(props.any)) {
     return false
   }
-  return !!user.value
+  return authStore.IS_AUTHENTICATED
 })
 </script>
 

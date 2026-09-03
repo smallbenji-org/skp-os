@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Topbar from './components/Topbar.vue'
 import Sidebar from './components/Sidebar.vue'
-import { useAuth } from './composables/useAuth'
+import AuthView from './views/AuthView.vue'
+import { useAuthStore } from '@/Stores/AuthStore'
 
-const { loadUser } = useAuth()
-loadUser()
+const authStore = useAuthStore()
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    await authStore.GET_ME()
+  } finally {
+    loading.value = false
+  }
+})
 
 import HomeView from './views/HomeView.vue'
 import ProjectsView from './views/ProjectsView.vue'
@@ -54,7 +63,11 @@ const currentViewComponent = computed(() => {
 </script>
 
 <template>
-  <main class="main-page">
+  <div v-if="loading" class="app-loader">
+    <div class="loader-spinner"></div>
+  </div>
+  <AuthView v-else-if="!authStore.IS_AUTHENTICATED" />
+  <main v-else class="main-page">
     <Sidebar
       v-model:collapsed="isSidebarCollapsed"
       v-model:active-tab="activeTab"
@@ -62,7 +75,9 @@ const currentViewComponent = computed(() => {
     <div class="app-body">
       <Topbar
         :is-sidebar-collapsed="isSidebarCollapsed"
+        :user-name="authStore.ME?.name || authStore.ME?.email || 'Bruger'"
         @toggle-sidebar="toggleSidebar"
+        @logout="authStore.LOGOUT"
       />
       <div class="content-area" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
         <Transition name="fade" mode="out-in">
@@ -117,5 +132,29 @@ const currentViewComponent = computed(() => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+
+.app-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #E1E6EA;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3.5px solid rgba(1, 107, 255, 0.2);
+  border-top-color: #016BFF;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
