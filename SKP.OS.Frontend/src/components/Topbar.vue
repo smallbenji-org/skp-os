@@ -47,7 +47,6 @@ const emit = defineEmits<{
           <IconUser :size="16" :stroke-width="2.2" />
         </div>
         <span class="profile-text">
-          <span class="profile-label">Profil:</span>
           <span class="profile-name">{{ userName }}</span>
         </span>
       </button>
@@ -139,7 +138,6 @@ const emit = defineEmits<{
 .profile-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
   height: 34px;
   padding: 0 12px 0 6px;
   background-color: #f8fafc;
