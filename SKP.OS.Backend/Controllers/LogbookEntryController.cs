@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
@@ -13,27 +14,32 @@ namespace SKP.OS.Backend.Controllers;
 public class LogbookEntryController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public LogbookEntryController(ApplicationDbContext context)
+    public LogbookEntryController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
-    /// <summary>Lists logbook entries, optionally filtered by student.</summary>
+    /// <summary>Lists logbook entries for the current user.</summary>
     /// <remarks>
-    /// If <c>studentProfileId</c> is provided, only entries for that student are returned.
+    /// Returns only the logbook entries belonging to the signed-in user's student profile.
     /// Entries are ordered newest first. Requires: authenticated user.
     /// </remarks>
-    /// <param name="studentProfileId">Optional. Filter to a single student profile.</param>
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int? studentProfileId = null)
+    public async Task<IActionResult> GetAll()
     {
-        var query = _context.LogbookEntries.AsQueryable();
-        if (studentProfileId.HasValue)
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
         {
-            query = query.Where(l => l.StudentProfileId == studentProfileId.Value);
+            return Unauthorized(new { message = "User not found." });
         }
-        var entries = await query
+
+        var entries = await _context.LogbookEntries
+            .Where(l => l.StudentProfile.ApplicationUserId == user.Id)
             .OrderByDescending(l => l.Date)
             .ToListAsync();
         return Ok(entries.Select(l => new LogbookEntryDto(l)));

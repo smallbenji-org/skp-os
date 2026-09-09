@@ -12,8 +12,8 @@ export const useLogbookEntryStore = defineStore("logbookEntry", () => {
   const LOGBOOK_ENTRIES = computed(() => LogbookEntries.value);
   const SELECTED_LOGBOOK_ENTRY = computed(() => SelectedLogbookEntry.value);
 
-  async function GET_LOGBOOK_ENTRIES(studentProfileId?: number) {
-    const data = await logbookEntryService.getLogbookEntries(studentProfileId);
+  async function GET_LOGBOOK_ENTRIES() {
+    const data = await logbookEntryService.getLogbookEntries();
     LogbookEntries.value = data;
     return data;
   }

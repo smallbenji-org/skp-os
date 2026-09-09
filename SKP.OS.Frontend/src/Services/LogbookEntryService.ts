@@ -3,12 +3,11 @@ import type { CreateLogbookEntryDto, LogbookEntryDto, UpdateLogbookEntryDto } fr
 import { api } from "./api";
 
 export default class LogbookEntryService {
-  public async getLogbookEntries(studentProfileId?: number): Promise<LogbookEntryDto[]> {
+  public async getLogbookEntries(): Promise<LogbookEntryDto[]> {
     try {
       const response: AxiosResponse<LogbookEntryDto[]> = await api({
         url: "/api/logbookentry",
-        method: "GET",
-        params: { studentProfileId }
+        method: "GET"
       });
       return response.data ? response.data : [];
     } catch {
