@@ -16,7 +16,7 @@ public class FFEntryDto
     }
 
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public TimeSpan Duration { get; set; }
     public string Note { get; set; } = string.Empty;
     public int StudentProfileId { get; set; }
@@ -24,7 +24,7 @@ public class FFEntryDto
 
 public class CreateFFEntryDto
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public TimeSpan Duration { get; set; }
     public string Note { get; set; } = string.Empty;
     public int StudentProfileId { get; set; }
@@ -32,7 +32,7 @@ public class CreateFFEntryDto
 
 public class UpdateFFEntryDto
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public TimeSpan Duration { get; set; }
     public string Note { get; set; } = string.Empty;
     public int StudentProfileId { get; set; }

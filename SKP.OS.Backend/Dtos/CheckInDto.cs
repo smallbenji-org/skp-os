@@ -18,8 +18,8 @@ public class CheckInDto
     }
 
     public int Id { get; set; }
-    public DateTime CheckInTime { get; set; }
-    public DateTime? CheckOutTime { get; set; }
+    public DateTimeOffset CheckInTime { get; set; }
+    public DateTimeOffset? CheckOutTime { get; set; }
     public string Seat { get; set; } = string.Empty;
     public int StudentProfileId { get; set; }
     public int RoomId { get; set; }
@@ -28,8 +28,8 @@ public class CheckInDto
 
 public class CreateCheckInDto
 {
-    public DateTime CheckInTime { get; set; }
-    public DateTime? CheckOutTime { get; set; }
+    public DateTimeOffset CheckInTime { get; set; }
+    public DateTimeOffset? CheckOutTime { get; set; }
     public string Seat { get; set; } = string.Empty;
     public int StudentProfileId { get; set; }
     public int RoomId { get; set; }
@@ -37,8 +37,8 @@ public class CreateCheckInDto
 
 public class UpdateCheckInDto
 {
-    public DateTime CheckInTime { get; set; }
-    public DateTime? CheckOutTime { get; set; }
+    public DateTimeOffset CheckInTime { get; set; }
+    public DateTimeOffset? CheckOutTime { get; set; }
     public string Seat { get; set; } = string.Empty;
     public int RoomId { get; set; }
 }

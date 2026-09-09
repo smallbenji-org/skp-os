@@ -16,7 +16,7 @@ public class LogbookEntryDto
     }
 
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Entry { get; set; } = string.Empty;
     public bool HasSearchedForJob { get; set; }
     public int StudentProfileId { get; set; }
@@ -24,7 +24,7 @@ public class LogbookEntryDto
 
 public class CreateLogbookEntryDto
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Entry { get; set; } = string.Empty;
     public bool HasSearchedForJob { get; set; }
     public int StudentProfileId { get; set; }
@@ -32,7 +32,7 @@ public class CreateLogbookEntryDto
 
 public class UpdateLogbookEntryDto
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Entry { get; set; } = string.Empty;
     public bool HasSearchedForJob { get; set; }
     public int StudentProfileId { get; set; }

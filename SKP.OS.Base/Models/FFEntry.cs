@@ -1,13 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SKP.OS.Base.Models;
 
 public class FFEntry
 {
     public int Id { get; set; }
 
-    [DataType(DataType.Date)]
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
 
     public TimeSpan Duration { get; set; }
 

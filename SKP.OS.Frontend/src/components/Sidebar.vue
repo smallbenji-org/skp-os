@@ -53,7 +53,7 @@ const setTabRef = (name: string, el: any) => {
 const updateIndicator = () => {
   const activeEl = tabRefs.get(activeName.value)
   const sidebarEl = sidebarRef.value
-  if (activeEl && sidebarEl) {
+  if (activeEl instanceof HTMLElement && sidebarEl instanceof HTMLElement) {
     const sidebarRect = sidebarEl.getBoundingClientRect()
     const activeRect = activeEl.getBoundingClientRect()
     const borderTop = parseFloat(getComputedStyle(sidebarEl).borderTopWidth) || 0

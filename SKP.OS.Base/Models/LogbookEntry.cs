@@ -3,7 +3,7 @@ namespace SKP.OS.Base.Models;
 public class LogbookEntry
 {
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Entry { get; set; }
     public bool HasSearchedForJob { get; set; }
 

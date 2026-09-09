@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend;
+using SKP.OS.Backend.Converters;
 using SKP.OS.Base;
 using SKP.OS.Base.Models;
 
@@ -24,6 +25,7 @@ builder.Services.AddControllers()
             JsonNumberHandling.WriteAsString;
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new UtcDateTimeOffsetJsonConverter());
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

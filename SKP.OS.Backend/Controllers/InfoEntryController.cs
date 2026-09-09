@@ -74,7 +74,7 @@ public class InfoEntryController : ControllerBase
         {
             Title = dto.Title,
             Content = dto.Content,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
             IsPinned = dto.IsPinned,
             InstructorProfileId = dto.InstructorProfileId
         };
