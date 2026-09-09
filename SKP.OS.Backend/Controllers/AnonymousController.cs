@@ -14,7 +14,7 @@ public class AnonymousController(IWebHostEnvironment env) : Controller
 
     private IActionResult SpaIndex()
     {
-        var filePath = Path.Combine(env.ContentRootPath, "wwwroot", "index.html");
+        var filePath = Path.Combine(env.ContentRootPath, "wwwroot", "dist", "index.html");
         return PhysicalFile(filePath, "text/html");
     }
 }
