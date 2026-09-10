@@ -382,7 +382,6 @@ onMounted(async () => {
           <div class="balance-container">
             <span class="balance-label">Din FF-saldo</span>
             <div class="balance-value-row">
-              <span class="balance-dot" :class="balanceStatusClass" />
               <span class="balance-text">{{ formattedBalance }}</span>
               <span
                 v-if="totalBalanceMinutes > 37 * 60"
@@ -826,25 +825,6 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.balance-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.balance-dot.normal {
-  background: #10b981;
-}
-
-.balance-dot.warning {
-  background: #f59e0b;
-}
-
-.balance-dot.negative {
-  background: #ef4444;
 }
 
 .balance-text {

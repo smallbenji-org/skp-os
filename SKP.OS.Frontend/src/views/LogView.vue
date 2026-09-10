@@ -243,7 +243,6 @@ onMounted(async () => {
               class="status-meta"
               :class="todayExistingEntry ? 'written' : 'missing'"
             >
-              <span class="dot" />
               {{ todayExistingEntry ? "Skrevet i dag" : "Ikke skrevet endnu" }}
             </span>
           </div>
@@ -597,21 +596,6 @@ onMounted(async () => {
   font-size: 11.5px;
   font-weight: 500;
   color: #6b7280;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.status-meta.missing .dot {
-  background: #d4a017;
-}
-
-.status-meta.written .dot {
-  background: #4ade80;
 }
 
 .log-textarea {
