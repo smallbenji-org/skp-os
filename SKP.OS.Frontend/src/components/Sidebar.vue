@@ -34,9 +34,6 @@ const tabs = computed(() => {
     { name: 'meddelelser', label: 'Aktuelle Meddelelser', icon: IconInbox },
     { name: 'info', label: 'Information', icon: IconInfoCircle },
   ]
-  if (authStore.HAS_ROLE('Instructor')) {
-    list.splice(1, 0, { name: 'underviser', label: 'Instruktør', icon: IconSchool })
-  }
   return list
 })
 
