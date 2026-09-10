@@ -26,6 +26,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+builder.Entity<ApplicationUser>()
+            .Property(u => u.Name)
+            .HasDefaultValue(string.Empty);
+
         builder.Entity<StudentProfile>()
             .HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<StudentProfile>()
@@ -69,9 +73,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                     .ToList())
             .Metadata.SetValueComparer(
                 new ValueComparer<ICollection<ProjectHaul>>(
-                    (a, b) => a.SequenceEqual(b),
-                    c => c.Aggregate(0, (acc, v) => HashCode.Combine(acc, v.GetHashCode())),
-                    c => c.ToList()));
+                    (a, b) => (a ?? Enumerable.Empty<ProjectHaul>()).SequenceEqual(b ?? Enumerable.Empty<ProjectHaul>()),
+                    c => (c ?? Enumerable.Empty<ProjectHaul>()).Aggregate(0, (acc, v) => HashCode.Combine(acc, v.GetHashCode())),
+                    c => (c ?? Enumerable.Empty<ProjectHaul>()).ToList()));
 
         builder.Entity<InstructorProfile>()
             .HasOne(ip => ip.User)

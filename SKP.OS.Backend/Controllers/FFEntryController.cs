@@ -33,7 +33,7 @@ public class FFEntryController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] int? studentProfileId = null)
     {
         var query = _context.FFEntries
-            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip!.User)
             .AsQueryable();
         if (studentProfileId.HasValue)
         {
@@ -52,7 +52,7 @@ public class FFEntryController : ControllerBase
     public async Task<IActionResult> Get(int id)
     {
         var entry = await _context.FFEntries
-            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip!.User)
             .FirstOrDefaultAsync(f => f.Id == id);
         if (entry == null)
         {
@@ -106,7 +106,7 @@ public class FFEntryController : ControllerBase
         await _context.SaveChangesAsync();
 
         var created = await _context.FFEntries
-            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip!.User)
             .FirstAsync(f => f.Id == entry.Id);
         return Ok(new FFEntryDto(created));
     }
@@ -122,7 +122,7 @@ public class FFEntryController : ControllerBase
     public async Task<IActionResult> Update(int id, [FromBody] UpdateFFEntryDto dto)
     {
         var entry = await _context.FFEntries
-            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip!.User)
             .FirstOrDefaultAsync(f => f.Id == id);
         if (entry == null)
         {
