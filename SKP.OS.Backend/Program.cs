@@ -5,6 +5,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend;
 using SKP.OS.Backend.Converters;
+using SKP.OS.Backend.Workers;
 using SKP.OS.Base;
 using SKP.OS.Base.Models;
 
@@ -15,6 +16,8 @@ builder.WebHost.UseStaticWebAssets();
 var settings = new Settings();
 builder.Configuration.GetSection("Database").Bind(settings);
 builder.Services.AddSingleton(settings);
+
+builder.Services.AddHostedService<DailyFFGrantWorker>();
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
