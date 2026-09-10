@@ -220,7 +220,6 @@ onMounted(async () => {
     <div class="page-header">
       <div class="header-titles">
         <h1 class="page-title">Hvor er jeg nu</h1>
-        <p class="page-subtitle">Vælg din aktuelle placering nedenfor.</p>
       </div>
     </div>
 

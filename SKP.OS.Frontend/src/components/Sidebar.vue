@@ -10,7 +10,6 @@ import {
   IconMapPin, 
   IconInbox, 
   IconInfoCircle, 
-  IconHelpCircle,
   IconSchool,
   IconSettings
 } from '@tabler/icons-vue'
@@ -33,7 +32,6 @@ const tabs = computed(() => {
     { name: 'location', label: 'Tjek Ind', icon: IconMapPin },
     { name: 'meddelelser', label: 'Aktuelle Meddelelser', icon: IconInbox },
     { name: 'info', label: 'Information', icon: IconInfoCircle },
-    { name: 'hjaelp', label: 'Hjælp', icon: IconHelpCircle },
   ]
   if (authStore.HAS_ROLE('Instructor')) {
     list.splice(1, 0, { name: 'underviser', label: 'Instruktør', icon: IconSchool })
@@ -151,6 +149,18 @@ onUnmounted(() => {
 
     <div class="sidebar-footer">
       <RouterLink
+        v-if="authStore.HAS_ROLE('Instructor')"
+        :ref="(el) => setTabRef('underviser', el as any)"
+        :to="{ name: 'underviser' }"
+        class="tab-item"
+        :class="{ active: activeName === 'underviser' }"
+        :title="isCollapsed ? 'Instruktør' : undefined"
+        aria-label="Instruktør"
+      >
+        <IconSchool :size="20" :stroke-width="2" class="tab-icon" />
+        <span class="tab-label">Instruktør</span>
+      </RouterLink>
+      <RouterLink
         :ref="(el) => setTabRef('indstillinger', el as any)"
         :to="{ name: 'indstillinger' }"
         class="tab-item"
@@ -241,7 +251,7 @@ onUnmounted(() => {
 
 .active-indicator.animated {
   transition: 
-    transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1),
+    transform 0.4s cubic-bezier(0.34, 1.08, 0.64, 1),
     left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
