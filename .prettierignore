@@ -1,0 +1,8 @@
+node_modules
+SKP.OS.Frontend/node_modules
+SKP.OS.Frontend/dist
+SKP.OS.Backend/wwwroot
+SKP.OS.Backend/bin
+SKP.OS.Backend/obj
+SKP.OS.Base/bin
+SKP.OS.Base/obj
