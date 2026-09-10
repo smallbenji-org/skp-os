@@ -26,7 +26,7 @@ import { useProjectStore } from "@/Stores/ProjectStore";
 import { useProjectTemplateStore } from "@/Stores/ProjectTemplateStore";
 import { useInstructorProfileStore } from "@/Stores/InstructorProfileStore";
 import { useAnnouncementStore } from "@/Stores/AnnouncementStore";
-import type { AnnouncementDto, CheckInDto, FFEntryDto, ProjectHaul, StudentProfileDto, StudentType } from "@/types";
+import type { AnnouncementDto, CheckInDto, ContractType, FFEntryDto, ProjectHaul, StudentProfileDto, StudentType } from "@/types";
 
 const studentProfileStore = useStudentProfileStore();
 const checkInStore = useCheckInStore();
@@ -47,6 +47,13 @@ const STUDENT_TYPES: StudentType[] = [
   "Infrastructure",
   "ItSupporter",
   "Cybersecurity",
+];
+const CONTRACT_TYPES: ContractType[] = [
+  "Skoleoplæring",
+  "Delaftale",
+  "Læreplads",
+  "Skoleophold",
+  "VFO",
 ];
 
 const today = new Date();
@@ -172,11 +179,56 @@ const selectedStudent = computed(
   () => students.value.find((s) => s.id === selectedStudentId.value) ?? null,
 );
 
+const editStudentType = ref<StudentType>("Programmer");
+const editContractType = ref<ContractType>("Skoleoplæring");
+const editIsEuxStudent = ref(false);
+const editCompletedHauls = ref<ProjectHaul[]>([]);
+const isSavingInfo = ref(false);
+const infoFeedback = ref<"idle" | "success" | "error">("idle");
+
 function selectStudent(studentId: number) {
-  selectedStudentId.value =
-    selectedStudentId.value === studentId ? null : studentId;
+  const next = selectedStudentId.value === studentId ? null : studentId;
+  selectedStudentId.value = next;
   grantFeedback.value = "idle";
   grantNote.value = "";
+  infoFeedback.value = "idle";
+  if (next != null) {
+    const s = students.value.find((st) => st.id === next);
+    if (s) {
+      editStudentType.value = s.studentType;
+      editContractType.value = s.contractType;
+      editIsEuxStudent.value = s.isEuxStudent;
+      editCompletedHauls.value = [...s.completedHauls];
+    }
+  }
+}
+
+function toggleCompletedHaul(haul: ProjectHaul) {
+  const idx = editCompletedHauls.value.indexOf(haul);
+  if (idx >= 0) {
+    editCompletedHauls.value.splice(idx, 1);
+  } else {
+    editCompletedHauls.value.push(haul);
+  }
+}
+
+async function saveStudentInfo() {
+  const studentId = selectedStudentId.value;
+  if (studentId == null || isSavingInfo.value) return;
+  isSavingInfo.value = true;
+  infoFeedback.value = "idle";
+  const result = await studentProfileStore.UPDATE_STUDENT_PROFILE(studentId, {
+    studentType: editStudentType.value,
+    contractType: editContractType.value,
+    isEuxStudent: editIsEuxStudent.value,
+    isCheckInBlocked: selectedStudent.value?.isCheckInBlocked ?? false,
+    completedHauls: editCompletedHauls.value,
+  });
+  isSavingInfo.value = false;
+  infoFeedback.value = result ? "success" : "error";
+  window.setTimeout(() => {
+    infoFeedback.value = "idle";
+  }, 3000);
 }
 
 const grantMode = ref<"add" | "deduct">("add");
@@ -525,8 +577,10 @@ onMounted(async () => {
 
     <template v-else>
       <div class="surface">
-        <nav class="tab-bar" aria-label="Instruktør sektioner">
+        <nav class="tab-bar" role="tablist" aria-label="Instruktør sektioner">
           <button
+            role="tab"
+            :aria-selected="activeTab === 'students'"
             class="tab-btn"
             :class="{ active: activeTab === 'students' }"
             @click="activeTab = 'students'"
@@ -535,6 +589,8 @@ onMounted(async () => {
             Elevoversigt
           </button>
           <button
+            role="tab"
+            :aria-selected="activeTab === 'rooms'"
             class="tab-btn"
             :class="{ active: activeTab === 'rooms' }"
             @click="activeTab = 'rooms'"
@@ -543,6 +599,8 @@ onMounted(async () => {
             Lokationer
           </button>
           <button
+            role="tab"
+            :aria-selected="activeTab === 'projects'"
             class="tab-btn"
             :class="{ active: activeTab === 'projects' }"
             @click="activeTab = 'projects'"
@@ -551,6 +609,8 @@ onMounted(async () => {
             SKP Projekter
           </button>
           <button
+            role="tab"
+            :aria-selected="activeTab === 'templates'"
             class="tab-btn"
             :class="{ active: activeTab === 'templates' }"
             @click="activeTab = 'templates'"
@@ -559,6 +619,8 @@ onMounted(async () => {
             Skabeloner
           </button>
           <button
+            role="tab"
+            :aria-selected="activeTab === 'announcements'"
             class="tab-btn"
             :class="{ active: activeTab === 'announcements' }"
             @click="activeTab = 'announcements'"
@@ -568,7 +630,7 @@ onMounted(async () => {
           </button>
         </nav>
 
-        <section v-if="activeTab === 'students'" class="tab-panel">
+        <section v-if="activeTab === 'students'" class="tab-panel" role="tabpanel">
           <div class="summary-row">
             <div class="summary-chip present">
               <IconUserCheck :size="15" :stroke-width="2" />
@@ -596,16 +658,18 @@ onMounted(async () => {
           <table class="data-table" aria-label="Elevoversigt">
             <thead>
               <tr>
-                <th>Elev</th>
-                <th>Status</th>
-                <th>FF i alt</th>
-                <th>Tjek ind</th>
-                <th class="col-actions">Tildel FF</th>
+                <th scope="col">Elev</th>
+                <th scope="col">Type</th>
+                <th scope="col">Kontrakt</th>
+                <th scope="col">Status</th>
+                <th scope="col">FF i alt</th>
+                <th scope="col">Tjek ind</th>
+                <th scope="col" class="col-actions">Tildel FF</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="students.length === 0">
-                <td colspan="5" class="empty-row">Ingen elever fundet.</td>
+                <td colspan="7" class="empty-row">Ingen elever fundet.</td>
               </tr>
               <tr
                 v-for="student in students"
@@ -616,6 +680,12 @@ onMounted(async () => {
               >
                 <td class="cell-name">
                   {{ studentName(student) }}
+                </td>
+                <td>
+                  <span class="info-pill">{{ student.studentType }}</span>
+                </td>
+                <td>
+                  <span class="info-pill">{{ student.contractType }}</span>
                 </td>
                 <td class="cell-status">
                   <span
@@ -641,8 +711,8 @@ onMounted(async () => {
                     class="block-btn"
                     :class="{ blocked: student.isCheckInBlocked }"
                     :disabled="isTogglingBlock === student.id"
-                    @click="toggleCheckInBlock(student)"
                     :title="student.isCheckInBlocked ? 'Fjern blokering af tjek ind' : 'Bloker tjek ind'"
+                    @click="toggleCheckInBlock(student)"
                   >
                     <IconLock
                       v-if="student.isCheckInBlocked"
@@ -679,11 +749,92 @@ onMounted(async () => {
                 </div>
                 <button
                   class="icon-btn"
-                  @click="selectedStudentId = null"
                   aria-label="Luk detaljer"
+                  @click="selectedStudentId = null"
                 >
                   <IconX :size="16" :stroke-width="2.2" />
                 </button>
+              </div>
+
+              <div class="info-form">
+                <div class="info-form-header">Elevinformation</div>
+                <div class="info-form-grid">
+                  <div class="form-field">
+                    <label class="form-label" for="edit-student-type">Elevtype</label>
+                    <select
+                      id="edit-student-type"
+                      v-model="editStudentType"
+                      class="form-select"
+                    >
+                      <option v-for="type in STUDENT_TYPES" :key="type" :value="type">
+                        {{ type }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="edit-contract-type">Kontrakttype</label>
+                    <select
+                      id="edit-contract-type"
+                      v-model="editContractType"
+                      class="form-select"
+                    >
+                      <option v-for="ct in CONTRACT_TYPES" :key="ct" :value="ct">
+                        {{ ct }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-field checkbox-field">
+                    <label class="checkbox-label">
+                      <input
+                        v-model="editIsEuxStudent"
+                        type="checkbox"
+                      />
+                      <span class="checkbox-text">EUX elev</span>
+                    </label>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label">Gennemførte forløb</label>
+                    <div class="haul-checkboxes">
+                      <label
+                        v-for="haul in HAULS"
+                        :key="haul"
+                        class="checkbox-label"
+                      >
+                        <input
+                          type="checkbox"
+                          :checked="editCompletedHauls.includes(haul)"
+                          @change="toggleCompletedHaul(haul)"
+                        />
+                        <span class="checkbox-text">{{ haul }}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-form-actions">
+                  <button
+                    class="create-btn"
+                    type="button"
+                    :disabled="isSavingInfo"
+                    @click="saveStudentInfo"
+                  >
+                    <IconCheck :size="15" :stroke-width="2.5" />
+                    Gem oplysninger
+                  </button>
+                  <span
+                    v-if="infoFeedback === 'success'"
+                    class="save-feedback success"
+                  >
+                    <IconCheck :size="13" :stroke-width="2.5" />
+                    Gemt
+                  </span>
+                  <span
+                    v-else-if="infoFeedback === 'error'"
+                    class="save-feedback error"
+                  >
+                    <IconAlertTriangle :size="13" :stroke-width="2" />
+                    Kunne ikke gemme
+                  </span>
+                </div>
               </div>
 
               <div class="grant-form">
@@ -755,11 +906,11 @@ onMounted(async () => {
               <table class="data-table inner" aria-label="FF registreringer">
                 <thead>
                   <tr>
-                    <th>Dato</th>
-                    <th>Instruktør</th>
-                    <th>Varighed</th>
-                    <th>Note</th>
-                    <th class="col-actions"></th>
+                    <th scope="col">Dato</th>
+                    <th scope="col">Instruktør</th>
+                    <th scope="col">Varighed</th>
+                    <th scope="col">Note</th>
+                    <th scope="col" class="col-actions"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -776,8 +927,8 @@ onMounted(async () => {
                     <td class="cell-actions">
                       <button
                         class="icon-btn danger"
-                        @click="deleteFFEntry(entry.id)"
                         aria-label="Slet FF registrering"
+                        @click="deleteFFEntry(entry.id)"
                       >
                         <IconTrash :size="15" :stroke-width="2" />
                       </button>
@@ -789,7 +940,7 @@ onMounted(async () => {
           </Transition>
         </section>
 
-        <section v-else-if="activeTab === 'rooms'" class="tab-panel">
+        <section v-else-if="activeTab === 'rooms'" class="tab-panel" role="tabpanel">
           <div class="section-heading">Opret lokation</div>
           <form class="create-form" @submit.prevent="createRoom">
             <div class="form-field">
@@ -841,10 +992,10 @@ onMounted(async () => {
           <table class="data-table" aria-label="Lokationer">
             <thead>
               <tr>
-                <th>Navn</th>
-                <th>Placering</th>
-                <th>Til stede</th>
-                <th class="col-actions"></th>
+                <th scope="col">Navn</th>
+                <th scope="col">Placering</th>
+                <th scope="col">Til stede</th>
+                <th scope="col" class="col-actions"></th>
               </tr>
             </thead>
             <tbody>
@@ -860,8 +1011,8 @@ onMounted(async () => {
                 <td class="cell-actions">
                   <button
                     class="icon-btn danger"
-                    @click="deleteRoom(room.id)"
                     aria-label="Slet lokation"
+                    @click="deleteRoom(room.id)"
                   >
                     <IconTrash :size="15" :stroke-width="2" />
                   </button>
@@ -871,7 +1022,7 @@ onMounted(async () => {
           </table>
         </section>
 
-        <section v-else-if="activeTab === 'projects'" class="tab-panel">
+        <section v-else-if="activeTab === 'projects'" class="tab-panel" role="tabpanel">
           <div class="section-heading">Opret SKP projekt</div>
           <form class="create-form" @submit.prevent="createProject">
             <div class="form-field">
@@ -998,8 +1149,8 @@ onMounted(async () => {
                   {{ studentName(member) }}
                   <button
                     class="chip-remove"
-                    @click="unassignStudent(project.id, member.id)"
                     aria-label="Fjern elev fra projekt"
+                    @click="unassignStudent(project.id, member.id)"
                   >
                     <IconX :size="12" :stroke-width="2.5" />
                   </button>
@@ -1034,7 +1185,7 @@ onMounted(async () => {
           </article>
         </section>
 
-        <section v-else-if="activeTab === 'templates'" class="tab-panel">
+        <section v-else-if="activeTab === 'templates'" class="tab-panel" role="tabpanel">
           <div class="section-heading">Opret skabelon</div>
           <form class="create-form" @submit.prevent="createTemplate">
             <div class="form-field">
@@ -1121,12 +1272,12 @@ onMounted(async () => {
           <table class="data-table" aria-label="Skabeloner">
             <thead>
               <tr>
-                <th>Titel</th>
-                <th>Kort beskrivelse</th>
-                <th>Forløb</th>
-                <th>Elevtype</th>
-                <th>Git repository</th>
-                <th class="col-actions"></th>
+                <th scope="col">Titel</th>
+                <th scope="col">Kort beskrivelse</th>
+                <th scope="col">Forløb</th>
+                <th scope="col">Elevtype</th>
+                <th scope="col">Git repository</th>
+                <th scope="col" class="col-actions"></th>
               </tr>
             </thead>
             <tbody>
@@ -1142,8 +1293,8 @@ onMounted(async () => {
                 <td class="cell-actions">
                   <button
                     class="icon-btn danger"
-                    @click="deleteTemplate(template.id)"
                     aria-label="Slet skabelon"
+                    @click="deleteTemplate(template.id)"
                   >
                     <IconTrash :size="15" :stroke-width="2" />
                   </button>
@@ -1153,7 +1304,7 @@ onMounted(async () => {
           </table>
         </section>
 
-        <section v-else-if="activeTab === 'announcements'" class="tab-panel">
+        <section v-else-if="activeTab === 'announcements'" class="tab-panel" role="tabpanel">
           <div class="section-heading">Ny meddelelse</div>
           <form class="create-form" @submit.prevent="createAnnouncement">
             <div class="form-field">
@@ -1224,11 +1375,11 @@ onMounted(async () => {
           <table class="data-table" aria-label="Meddelelser">
             <thead>
               <tr>
-                <th>Titel</th>
-                <th>Besked</th>
-                <th>Dato</th>
-                <th>Status</th>
-                <th class="col-actions"></th>
+                <th scope="col">Titel</th>
+                <th scope="col">Besked</th>
+                <th scope="col">Dato</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="col-actions"></th>
               </tr>
             </thead>
             <tbody>
@@ -1242,8 +1393,8 @@ onMounted(async () => {
                   <button
                     class="status-toggle-btn"
                     :class="{ active: announcement.isActive }"
-                    @click="toggleAnnouncementActive(announcement)"
                     :title="announcement.isActive ? 'Skjul meddelelse' : 'Vis meddelelse'"
+                    @click="toggleAnnouncementActive(announcement)"
                   >
                     {{ announcement.isActive ? "Aktiv" : "Skjult" }}
                   </button>
@@ -1251,8 +1402,8 @@ onMounted(async () => {
                 <td class="cell-actions">
                   <button
                     class="icon-btn danger"
-                    @click="deleteAnnouncement(announcement.id)"
                     aria-label="Slet meddelelse"
+                    @click="deleteAnnouncement(announcement.id)"
                   >
                     <IconTrash :size="15" :stroke-width="2" />
                   </button>
@@ -1689,16 +1840,6 @@ onMounted(async () => {
   color: #111827;
 }
 
-.icon-btn.primary {
-  color: #ffffff;
-  background: #016bff;
-  border-color: #016bff;
-}
-
-.icon-btn.primary:hover {
-  background: #005ae0;
-}
-
 .icon-btn.danger {
   color: #dc2626;
   border-color: #fecaca;
@@ -2106,5 +2247,50 @@ textarea.form-input {
 .details-fade-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+
+.info-form {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.info-form-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.info-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.info-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.haul-checkboxes {
+  display: flex;
+  gap: 12px;
+}
+
+.info-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  white-space: nowrap;
 }
 </style>
