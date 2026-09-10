@@ -128,7 +128,7 @@ public class InfoEntryController : ControllerBase
             return NotFound(new { message = "Info entry not found." });
         }
 
-        _context.InfoEntries.Remove(entry);
+        entry.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

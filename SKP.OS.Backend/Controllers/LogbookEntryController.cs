@@ -132,7 +132,7 @@ public class LogbookEntryController : ControllerBase
             return NotFound(new { message = "Logbook entry not found." });
         }
 
-        _context.LogbookEntries.Remove(entry);
+        entry.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

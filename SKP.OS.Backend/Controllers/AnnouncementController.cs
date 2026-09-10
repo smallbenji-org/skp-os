@@ -118,7 +118,7 @@ public class AnnouncementController : ControllerBase
             return NotFound(new { message = "Announcement not found." });
         }
 
-        _context.Announcements.Remove(announcement);
+        announcement.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

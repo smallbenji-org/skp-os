@@ -142,7 +142,14 @@ public class StudentProfileController : ControllerBase
         profile.IsEuxStudent = dto.IsEuxStudent;
         profile.IsCheckInBlocked = dto.IsCheckInBlocked;
         profile.CompletedHauls = dto.CompletedHauls ?? [];
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { message = "Profilen er ændret af en anden. Prøv igen." });
+        }
 
         return Ok(new StudentProfileDto(profile));
     }
@@ -160,8 +167,15 @@ public class StudentProfileController : ControllerBase
             return NotFound(new { message = "Student profile not found." });
         }
 
-        _context.StudentProfiles.Remove(profile);
-        await _context.SaveChangesAsync();
+        profile.IsDeleted = true;
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { message = "Profilen er ændret af en anden. Prøv igen." });
+        }
         return NoContent();
     }
 

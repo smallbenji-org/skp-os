@@ -140,7 +140,14 @@ public class FFEntryController : ControllerBase
         entry.Duration = dto.Duration;
         entry.Note = dto.Note;
         entry.StudentProfileId = dto.StudentProfileId;
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { message = "FF-oftelsen er ændret af en anden. Prøv igen." });
+        }
 
         return Ok(new FFEntryDto(entry));
     }
@@ -159,8 +166,15 @@ public class FFEntryController : ControllerBase
             return NotFound(new { message = "FF entry not found." });
         }
 
-        _context.FFEntries.Remove(entry);
-        await _context.SaveChangesAsync();
+        entry.IsDeleted = true;
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { message = "FF-oftelsen er ændret af en anden. Prøv igen." });
+        }
         return NoContent();
     }
 }

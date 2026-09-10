@@ -26,6 +26,33 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<StudentProfile>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<StudentProfile>()
+            .Property<uint>("xmin")
+            .IsRowVersion();
+        builder.Entity<InstructorProfile>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Project>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<ProjectTemplate>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<LogbookEntry>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<FFEntry>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<FFEntry>()
+            .Property<uint>("xmin")
+            .IsRowVersion();
+        builder.Entity<CheckIn>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Room>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<InfoEntry>()
+            .HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<Announcement>()
+            .HasQueryFilter(e => !e.IsDeleted);
+
         base.OnModelCreating(builder);
 
         builder.Entity<StudentProfile>()

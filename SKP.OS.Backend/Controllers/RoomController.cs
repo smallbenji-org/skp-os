@@ -103,7 +103,7 @@ public class RoomController : ControllerBase
             return NotFound(new { message = "Room not found." });
         }
 
-        _context.Rooms.Remove(room);
+        room.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

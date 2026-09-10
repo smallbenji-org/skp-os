@@ -152,7 +152,7 @@ public class ProjectController : ControllerBase
             return NotFound(new { message = "Project not found." });
         }
 
-        _context.Projects.Remove(project);
+        project.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

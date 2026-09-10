@@ -183,7 +183,7 @@ public class CheckInController : ControllerBase
             return NotFound(new { message = "Check-in not found." });
         }
 
-        _context.CheckIns.Remove(checkIn);
+        checkIn.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

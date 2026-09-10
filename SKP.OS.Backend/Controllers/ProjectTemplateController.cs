@@ -129,7 +129,7 @@ public class ProjectTemplateController : ControllerBase
             return NotFound(new { message = "Project template not found." });
         }
 
-        _context.ProjectTemplates.Remove(template);
+        template.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }

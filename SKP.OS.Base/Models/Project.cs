@@ -1,6 +1,6 @@
 namespace SKP.OS.Base.Models;
 
-public class Project
+public class Project : ISoftDeletable
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -10,6 +10,7 @@ public class Project
     public string Perspektivering { get; set; }
     public string GitRepoUrl { get; set; }
     public bool IsCustomProject { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int? ProjectTemplateId { get; set; }
     public ProjectTemplate ProjectTemplate { get; set; }

@@ -1,6 +1,6 @@
 namespace SKP.OS.Base.Models;
 
-public class ProjectTemplate
+public class ProjectTemplate : ISoftDeletable
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -8,6 +8,7 @@ public class ProjectTemplate
     public string GitRepoUrl { get; set; }
     public ProjectHaul Haul { get; set; }
     public StudentType StudentType { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int InstructorProfileId { get; set; }
     public InstructorProfile InstructorProfile { get; set; }

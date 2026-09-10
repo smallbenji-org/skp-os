@@ -172,7 +172,7 @@ public class InstructorProfileController : ControllerBase
             return NotFound(new { message = "Instructor profile not found." });
         }
 
-        _context.InstructorProfiles.Remove(profile);
+        profile.IsDeleted = true;
         await _context.SaveChangesAsync();
         return NoContent();
     }
