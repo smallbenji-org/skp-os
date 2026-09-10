@@ -7,8 +7,7 @@ namespace SKP.OS.Backend.Workers;
 
 /// <summary>
 /// Grants every student 3 FF hours each day with the note
-/// "FF justrering for: {month}". Runs on startup (catches up on the
-/// current day, guarded against duplicates) and then once per day at 00:01.
+/// "FF justrering for: {month}". Runs once per day at 03:00.
 /// </summary>
 public class DailyFFGrantWorker : BackgroundService
 {
@@ -25,17 +24,15 @@ public class DailyFFGrantWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await GrantTodayIfNeededAsync(stoppingToken);
-
         while (!stoppingToken.IsCancellationRequested)
         {
             var now = DateTimeOffset.Now;
-            var nextRun = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 1, 0, now.Offset).AddDays(1);
-            var delay = nextRun - now;
-            if (delay <= TimeSpan.Zero)
+            var nextRun = new DateTimeOffset(now.Year, now.Month, now.Day, 3, 0, 0, now.Offset);
+            if (nextRun <= now)
             {
-                delay = TimeSpan.FromMinutes(1);
+                nextRun = nextRun.AddDays(1);
             }
+            var delay = nextRun - now;
 
             try
             {
