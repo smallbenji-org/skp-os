@@ -1,7 +1,7 @@
 import InstructorProfileService from "@/Services/InstructorProfileService";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import type { CreateInstructorProfileDto, InstructorProfileDto } from "@/types";
+import type { CreateInstructorProfileDto, InstructorProfileDto, UpdateInstructorProfileDto } from "@/types";
 
 export const useInstructorProfileStore = defineStore("instructorProfile", () => {
   const instructorProfileService = new InstructorProfileService();
@@ -40,6 +40,15 @@ export const useInstructorProfileStore = defineStore("instructorProfile", () => 
     return created;
   }
 
+  async function UPDATE_INSTRUCTOR_PROFILE(id: number, data: UpdateInstructorProfileDto) {
+    const updated = await instructorProfileService.updateInstructorProfile(id, data);
+    if (updated) {
+      await GET_INSTRUCTOR_PROFILES();
+      SelectedInstructorProfile.value = updated;
+    }
+    return updated;
+  }
+
   async function DELETE_INSTRUCTOR_PROFILE(id: number) {
     const success = await instructorProfileService.deleteInstructorProfile(id);
     if (success) {
@@ -68,6 +77,6 @@ export const useInstructorProfileStore = defineStore("instructorProfile", () => 
     InstructorProfiles, SelectedInstructorProfile, MyInstructorProfile,
     INSTRUCTOR_PROFILES, SELECTED_INSTRUCTOR_PROFILE, MY_INSTRUCTOR_PROFILE,
     GET_INSTRUCTOR_PROFILES, GET_INSTRUCTOR_PROFILE, GET_MY_INSTRUCTOR_PROFILE,
-    CREATE_INSTRUCTOR_PROFILE, DELETE_INSTRUCTOR_PROFILE, ADD_STUDENT, REMOVE_STUDENT
+    CREATE_INSTRUCTOR_PROFILE, UPDATE_INSTRUCTOR_PROFILE, DELETE_INSTRUCTOR_PROFILE, ADD_STUDENT, REMOVE_STUDENT
   }
 });

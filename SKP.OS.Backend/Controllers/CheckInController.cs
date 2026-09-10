@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
@@ -64,17 +65,23 @@ public class CheckInController : ControllerBase
 
     /// <summary>Creates a new check-in.</summary>
     /// <remarks>
-    /// Requires the referenced student profile and room to exist.
-    /// <para>Returns 400 if the student profile or room does not exist.</para>
+    /// Requires the referenced student profile and room to exist. The student must not be
+    /// blocked from checking in.
+    /// <para>Returns 400 if the student profile or room does not exist, 403 if the student is blocked from checking in.</para>
     /// </remarks>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCheckInDto dto)
     {
-        var studentExists = await _context.StudentProfiles
-            .AnyAsync(sp => sp.Id == dto.StudentProfileId);
-        if (!studentExists)
+        var student = await _context.StudentProfiles
+            .FirstOrDefaultAsync(sp => sp.Id == dto.StudentProfileId);
+        if (student == null)
         {
             return BadRequest(new { message = "Student profile does not exist." });
+        }
+
+        if (student.IsCheckInBlocked)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Student is blocked from checking in." });
         }
 
         var roomExists = await _context.Rooms

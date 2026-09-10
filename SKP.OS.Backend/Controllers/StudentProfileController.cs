@@ -109,6 +109,7 @@ public class StudentProfileController : ControllerBase
             StudentType = dto.StudentType,
             ContractType = dto.ContractType,
             IsEuxStudent = dto.IsEuxStudent,
+            IsCheckInBlocked = dto.IsCheckInBlocked,
             CompletedHauls = dto.CompletedHauls ?? [],
             Instructors = [],
             Projects = []
@@ -121,7 +122,7 @@ public class StudentProfileController : ControllerBase
 
     /// <summary>Updates an existing student profile.</summary>
     /// <remarks>
-    /// Updates the student type, contract type, EUX status and completed hauls.
+    /// Updates the student type, contract type, EUX status, check-in blocking and completed hauls.
     /// <para>Returns 404 if the profile does not exist.</para>
     /// </remarks>
     /// <param name="id">The id of the student profile.</param>
@@ -139,6 +140,7 @@ public class StudentProfileController : ControllerBase
         profile.StudentType = dto.StudentType;
         profile.ContractType = dto.ContractType;
         profile.IsEuxStudent = dto.IsEuxStudent;
+        profile.IsCheckInBlocked = dto.IsCheckInBlocked;
         profile.CompletedHauls = dto.CompletedHauls ?? [];
         await _context.SaveChangesAsync();
 

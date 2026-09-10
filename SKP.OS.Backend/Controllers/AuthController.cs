@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
 using SKP.OS.Base.Models;
 using SKP.OS.Base;
@@ -157,6 +158,46 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(new { message = "User not found." });
         }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return Ok(new RolesDto { Roles = roles.ToList() });
+    }
+
+    /// <summary>TEMPORARY: Grants the current user the Instructor role.</summary>
+    /// <remarks>
+    /// Development-only helper. Adds the current user to the "Instructor" role
+    /// (creating the role if needed) and creates a matching
+    /// <see cref="InstructorProfile"/> if one does not already exist.
+    /// <para>Remove this endpoint before release.</para>
+    /// <para>Returns 200 with the user's updated roles, or 401 if not authenticated.</para>
+    /// </remarks>
+    [HttpGet("temp/make-instructor")]
+    public async Task<IActionResult> MakeInstructor()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        if (!await _roleManager.RoleExistsAsync("Instructor"))
+        {
+            await _roleManager.CreateAsync(new IdentityRole("Instructor"));
+        }
+        if (!await _userManager.IsInRoleAsync(user, "Instructor"))
+        {
+            await _userManager.AddToRoleAsync(user, "Instructor");
+        }
+
+        var hasProfile = await _context.InstructorProfiles
+            .AnyAsync(ip => ip.ApplicationUserId == user.Id);
+        if (!hasProfile)
+        {
+            _context.InstructorProfiles.Add(new InstructorProfile { ApplicationUserId = user.Id });
+            await _context.SaveChangesAsync();
+        }
+
+        await _signInManager.RefreshSignInAsync(user);
 
         var roles = await _userManager.GetRolesAsync(user);
         return Ok(new RolesDto { Roles = roles.ToList() });

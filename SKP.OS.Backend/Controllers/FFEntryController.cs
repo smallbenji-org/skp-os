@@ -57,9 +57,11 @@ public class FFEntryController : ControllerBase
     /// <summary>Creates a new FF entry.</summary>
     /// <remarks>
     /// Requires the referenced student profile to exist.
+    /// <para>Requires: Instructor role.</para>
     /// <para>Returns 400 if the student profile does not exist.</para>
     /// </remarks>
     [HttpPost]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create([FromBody] CreateFFEntryDto dto)
     {
         var studentExists = await _context.StudentProfiles
@@ -84,10 +86,12 @@ public class FFEntryController : ControllerBase
 
     /// <summary>Updates an existing FF entry.</summary>
     /// <remarks>
+    /// <para>Requires: Instructor role.</para>
     /// <para>Returns 404 if the entry does not exist, 400 if the student profile does not exist.</para>
     /// </remarks>
     /// <param name="id">The id of the FF entry.</param>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateFFEntryDto dto)
     {
         var entry = await _context.FFEntries
@@ -114,9 +118,10 @@ public class FFEntryController : ControllerBase
     }
 
     /// <summary>Deletes an FF entry.</summary>
-    /// <remarks>Returns 404 if the entry does not exist, otherwise 204 on success.</remarks>
+    /// <remarks>Requires: Instructor role. Returns 404 if the entry does not exist, otherwise 204 on success.</remarks>
     /// <param name="id">The id of the FF entry.</param>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Delete(int id)
     {
         var entry = await _context.FFEntries

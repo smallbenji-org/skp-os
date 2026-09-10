@@ -10,6 +10,7 @@ export interface StudentProfileDto {
     studentType: StudentType;
     contractType: ContractType;
     isEuxStudent: boolean;
+    isCheckInBlocked: boolean;
     completedHauls: ProjectHaul[];
 }
 
@@ -18,6 +19,7 @@ export interface CreateStudentProfileDto {
     studentType: StudentType;
     contractType: ContractType;
     isEuxStudent: boolean;
+    isCheckInBlocked: boolean;
     completedHauls: ProjectHaul[];
 }
 
@@ -25,5 +27,6 @@ export interface UpdateStudentProfileDto {
     studentType: StudentType;
     contractType: ContractType;
     isEuxStudent: boolean;
+    isCheckInBlocked: boolean;
     completedHauls: ProjectHaul[];
 }

@@ -11,26 +11,35 @@ import {
   IconInbox, 
   IconInfoCircle, 
   IconHelpCircle,
+  IconSchool,
   IconSettings
 } from '@tabler/icons-vue'
+import { useAuthStore } from '@/Stores/AuthStore'
 
 const isCollapsed = defineModel<boolean>('collapsed', { default: false })
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 const indicatorVisible = ref(false)
 
-const tabs = [
-  { name: 'forside', label: 'Forside', icon: IconHome },
-  { name: 'projekter', label: 'Mine Projekter', icon: IconFolderOpen },
-  { name: 'skp-projekter', label: 'SKP Projekter', icon: IconNotes },
-  { name: 'logbog', label: 'Logbog', icon: IconEdit },
-  { name: 'ff', label: 'FF Timer', icon: IconClock },
-  { name: 'location', label: 'Tjek Ind', icon: IconMapPin },
-  { name: 'meddelelser', label: 'Aktuelle Meddelelser', icon: IconInbox },
-  { name: 'info', label: 'Information', icon: IconInfoCircle },
-  { name: 'hjaelp', label: 'Hjælp', icon: IconHelpCircle },
-]
+const tabs = computed(() => {
+  const list = [
+    { name: 'forside', label: 'Forside', icon: IconHome },
+    { name: 'projekter', label: 'Mine Projekter', icon: IconFolderOpen },
+    { name: 'skp-projekter', label: 'SKP Projekter', icon: IconNotes },
+    { name: 'logbog', label: 'Logbog', icon: IconEdit },
+    { name: 'ff', label: 'FF Timer', icon: IconClock },
+    { name: 'location', label: 'Tjek Ind', icon: IconMapPin },
+    { name: 'meddelelser', label: 'Aktuelle Meddelelser', icon: IconInbox },
+    { name: 'info', label: 'Information', icon: IconInfoCircle },
+    { name: 'hjaelp', label: 'Hjælp', icon: IconHelpCircle },
+  ]
+  if (authStore.HAS_ROLE('Instructor')) {
+    list.splice(1, 0, { name: 'underviser', label: 'Underviser', icon: IconSchool })
+  }
+  return list
+})
 
 const activeName = computed(() => (route.name as string) || 'forside')
 

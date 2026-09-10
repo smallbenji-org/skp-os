@@ -302,3 +302,5 @@ node_modules
 
 docker-compose.test.yaml
 .DS_Store
+
+wwwroot

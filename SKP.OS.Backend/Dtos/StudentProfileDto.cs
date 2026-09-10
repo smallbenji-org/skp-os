@@ -14,6 +14,7 @@ public class StudentProfileDto
         StudentType = profile.StudentType;
         ContractType = profile.ContractType;
         IsEuxStudent = profile.IsEuxStudent;
+        IsCheckInBlocked = profile.IsCheckInBlocked;
         CompletedHauls = profile.CompletedHauls?.ToList() ?? [];
     }
 
@@ -23,6 +24,7 @@ public class StudentProfileDto
     public StudentType StudentType { get; set; }
     public ContractType ContractType { get; set; }
     public bool IsEuxStudent { get; set; }
+    public bool IsCheckInBlocked { get; set; }
     public List<ProjectHaul> CompletedHauls { get; set; } = [];
 }
 
@@ -32,6 +34,7 @@ public class CreateStudentProfileDto
     public StudentType StudentType { get; set; }
     public ContractType ContractType { get; set; }
     public bool IsEuxStudent { get; set; }
+    public bool IsCheckInBlocked { get; set; }
     public List<ProjectHaul> CompletedHauls { get; set; } = [];
 }
 
@@ -40,5 +43,6 @@ public class UpdateStudentProfileDto
     public StudentType StudentType { get; set; }
     public ContractType ContractType { get; set; }
     public bool IsEuxStudent { get; set; }
+    public bool IsCheckInBlocked { get; set; }
     public List<ProjectHaul> CompletedHauls { get; set; } = [];
 }

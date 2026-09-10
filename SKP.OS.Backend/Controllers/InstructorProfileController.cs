@@ -123,6 +123,42 @@ public class InstructorProfileController : ControllerBase
         return Ok(new InstructorProfileDto(profile));
     }
 
+    /// <summary>Updates an existing instructor profile.</summary>
+    /// <remarks>
+    /// Reassigns the profile to a different user.
+    /// <para>Returns 404 if the profile does not exist, 400 if the target user does not exist or already has a profile.</para>
+    /// </remarks>
+    /// <param name="id">The id of the instructor profile.</param>
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateInstructorProfileDto dto)
+    {
+        var profile = await _context.InstructorProfiles
+            .Include(ip => ip.User)
+            .FirstOrDefaultAsync(ip => ip.Id == id);
+        if (profile == null)
+        {
+            return NotFound(new { message = "Instructor profile not found." });
+        }
+
+        var userExists = await _userManager.FindByIdAsync(dto.ApplicationUserId);
+        if (userExists == null)
+        {
+            return BadRequest(new { message = "User does not exist." });
+        }
+
+        var alreadyExists = await _context.InstructorProfiles
+            .AnyAsync(ip => ip.ApplicationUserId == dto.ApplicationUserId && ip.Id != id);
+        if (alreadyExists)
+        {
+            return Conflict(new { message = "Another instructor profile already exists for this user." });
+        }
+
+        profile.ApplicationUserId = dto.ApplicationUserId;
+        await _context.SaveChangesAsync();
+
+        return Ok(new InstructorProfileDto(profile));
+    }
+
     /// <summary>Deletes an instructor profile.</summary>
     /// <remarks>Returns 404 if the profile does not exist, otherwise 204 on success.</remarks>
     /// <param name="id">The id of the instructor profile.</param>

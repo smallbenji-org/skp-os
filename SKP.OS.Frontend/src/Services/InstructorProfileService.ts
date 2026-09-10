@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import type { CreateInstructorProfileDto, InstructorProfileDto } from "@/types";
+import type { CreateInstructorProfileDto, InstructorProfileDto, UpdateInstructorProfileDto } from "@/types";
 import { api } from "./api";
 
 export default class InstructorProfileService {
@@ -44,6 +44,19 @@ export default class InstructorProfileService {
       const response: AxiosResponse<InstructorProfileDto> = await api({
         url: "/api/instructorprofile",
         method: "POST",
+        data
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public async updateInstructorProfile(id: number, data: UpdateInstructorProfileDto): Promise<InstructorProfileDto | null> {
+    try {
+      const response: AxiosResponse<InstructorProfileDto> = await api({
+        url: `/api/instructorprofile/${id}`,
+        method: "PUT",
         data
       });
       return response.data ? response.data : null;

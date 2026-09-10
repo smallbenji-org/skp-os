@@ -37,6 +37,12 @@ const router = createRouter({
           component: () => import('@/views/SKPProjectsView.vue'),
         },
         {
+          path: 'underviser',
+          name: 'underviser',
+          component: () => import('@/views/InstructorView.vue'),
+          meta: { roles: ['Instructor'] },
+        },
+        {
           path: 'logbog',
           name: 'logbog',
           component: () => import('@/views/LogView.vue'),

@@ -20,15 +20,19 @@ public class ProjectController : ControllerBase
     }
 
     /// <summary>Lists all projects.</summary>
-    /// <remarks>Returns every project (with its template) ordered by title. Requires: authenticated user.</remarks>
+    /// <remarks>Returns every project (with its template and assigned students) ordered by title. Requires: authenticated user.</remarks>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var projects = await _context.Projects
             .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .OrderBy(p => p.Title)
             .ToListAsync();
-        return Ok(projects.Select(p => new ProjectDto(p)));
+        return Ok(projects.Select(p => new ProjectDto(p)
+        {
+            Students = p.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? []
+        }));
     }
 
     /// <summary>Gets a single project by id.</summary>
