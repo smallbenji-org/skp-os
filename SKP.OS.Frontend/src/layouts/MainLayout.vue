@@ -14,6 +14,12 @@ const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
 }
 
+const handleProfileClick = () => {
+  if (authStore.HAS_ROLE('Student')) {
+    router.push({ name: 'profil' })
+  }
+}
+
 const handleLogout = async () => {
   await authStore.LOGOUT()
   router.push({ name: 'login' })
@@ -28,6 +34,7 @@ const handleLogout = async () => {
         :is-sidebar-collapsed="isSidebarCollapsed"
         :user-name="authStore.ME?.name || authStore.ME?.email || 'Bruger'"
         @toggle-sidebar="toggleSidebar"
+        @profile-click="handleProfileClick"
         @logout="handleLogout"
       />
       <div class="content-area" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">

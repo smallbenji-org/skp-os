@@ -43,6 +43,12 @@ const router = createRouter({
           meta: { roles: ['Instructor'] },
         },
         {
+          path: 'profil',
+          name: 'profil',
+          component: () => import('@/views/StudentView.vue'),
+          meta: { roles: ['Student'] },
+        },
+        {
           path: 'logbog',
           name: 'logbog',
           component: () => import('@/views/LogView.vue'),
