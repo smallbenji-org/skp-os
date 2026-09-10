@@ -15,6 +15,7 @@ builder.WebHost.UseStaticWebAssets();
 
 var settings = new Settings();
 builder.Configuration.GetSection("Database").Bind(settings);
+builder.Configuration.GetSection("CheckIn").Bind(settings.CheckIn);
 builder.Services.AddSingleton(settings);
 
 builder.Services.AddHostedService<DailyFFGrantWorker>();

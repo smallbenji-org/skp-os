@@ -1,4 +1,4 @@
-import type { AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import type { CheckInDto, CreateCheckInDto, UpdateCheckInDto } from "@/types";
 import { api } from "./api";
 
@@ -36,8 +36,11 @@ export default class CheckInService {
         data
       });
       return response.data ? response.data : null;
-    } catch {
-      return null;
+    } catch (error) {
+      if (axios.isAxiosError<{ message?: string }>(error)) {
+        throw new Error(error.response?.data?.message || "Tjek ind mislykkedes.");
+      }
+      throw new Error("Tjek ind mislykkedes.");
     }
   }
 

@@ -1,8 +1,10 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
+using SKP.OS.Backend.Networking;
 using SKP.OS.Base;
 using SKP.OS.Base.Models;
 
@@ -14,10 +16,12 @@ namespace SKP.OS.Backend.Controllers;
 public class CheckInController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly Settings _settings;
 
-    public CheckInController(ApplicationDbContext context)
+    public CheckInController(ApplicationDbContext context, Settings settings)
     {
         _context = context;
+        _settings = settings;
     }
 
     /// <summary>Lists check-ins, optionally filtered by student and/or room.</summary>
@@ -63,6 +67,21 @@ public class CheckInController : ControllerBase
         return Ok(new CheckInDto(checkIn));
     }
 
+    private IPAddress? GetClientIp()
+    {
+        var forwarded = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(forwarded))
+        {
+            var first = forwarded.Split(',')[0].Trim();
+            if (IPAddress.TryParse(first, out var ip))
+            {
+                return ip;
+            }
+        }
+
+        return HttpContext.Connection.RemoteIpAddress;
+    }
+
     /// <summary>Creates a new check-in.</summary>
     /// <remarks>
     /// Requires the referenced student profile and room to exist. The student must not be
@@ -72,6 +91,15 @@ public class CheckInController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCheckInDto dto)
     {
+        var clientIp = GetClientIp();
+        var allowedSubnets = _settings.CheckIn.AllowedSubnets;
+        if (allowedSubnets.Length > 0 &&
+            (clientIp == null || !SubnetMatcher.IsInAnySubnet(clientIp, allowedSubnets)))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { message = "Du skal være på skolens Wi-Fi for at tjekke ind." });
+        }
+
         var student = await _context.StudentProfiles
             .FirstOrDefaultAsync(sp => sp.Id == dto.StudentProfileId);
         if (student == null)

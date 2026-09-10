@@ -127,8 +127,9 @@ async function handleSelectLocation(loc: LocationOption) {
       }
     }
     showToast(`Du er nu tjekket ind på ${loc.name}`, "success");
-  } catch {
-    showToast(`Placering opdateret til ${loc.name}`, "success");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : `Kunne ikke tjekke ind på ${loc.name}`;
+    showToast(message, "warning");
   } finally {
     isSaving.value = false;
   }
