@@ -27,7 +27,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <main class="main-page">
+  <main class="main-page" role="main">
     <Sidebar v-model:collapsed="isSidebarCollapsed" />
     <div class="app-body">
       <Topbar

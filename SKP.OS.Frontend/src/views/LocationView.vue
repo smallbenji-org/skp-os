@@ -209,6 +209,7 @@ onMounted(async () => {
       }
     }
   } catch {
+    // Kunne ikke hente status – behandles som ikke tjekket ind.
   } finally {
     isLoading.value = false;
   }

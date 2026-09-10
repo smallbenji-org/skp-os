@@ -273,8 +273,8 @@ onMounted(async () => {
               </span>
               <input
                 id="log-applied-checkbox"
-                type="checkbox"
                 v-model="hasApplied"
+                type="checkbox"
                 class="sr-only"
               />
               <span class="checkbox-text"
@@ -362,8 +362,8 @@ onMounted(async () => {
           <table class="log-table" aria-label="Logbogsindlæg">
             <thead>
               <tr>
-                <th class="col-date">Dato</th>
-                <th class="col-entry">Indhold</th>
+                <th scope="col" class="col-date">Dato</th>
+                <th scope="col" class="col-entry">Indhold</th>
               </tr>
             </thead>
             <tbody>
@@ -399,8 +399,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage === 1"
-                @click="prevPage"
                 aria-label="Forrige side"
+                @click="prevPage"
               >
                 <IconChevronLeft :size="14" :stroke-width="2.2" />
               </button>
@@ -410,8 +410,8 @@ onMounted(async () => {
                   v-else
                   class="page-btn"
                   :class="{ active: p === currentPage }"
-                  @click="goToPage(p)"
                   :aria-current="p === currentPage ? 'page' : undefined"
+                  @click="goToPage(p)"
                 >
                   {{ p }}
                 </button>
@@ -419,8 +419,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage === totalPages"
-                @click="nextPage"
                 aria-label="Næste side"
+                @click="nextPage"
               >
                 <IconChevronRight :size="14" :stroke-width="2.2" />
               </button>

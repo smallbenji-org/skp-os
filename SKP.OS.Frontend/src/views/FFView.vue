@@ -446,12 +446,12 @@ onMounted(async () => {
             >
               <thead>
                 <tr>
-                  <th class="col-created">Oprettet dato/af</th>
-                  <th class="col-earned">Optjent</th>
-                  <th class="col-used">Afviklet</th>
-                  <th class="col-valid-from">Gyldig fra</th>
-                  <th class="col-valid-to">Gyldig til</th>
-                  <th class="col-note">Notat</th>
+                  <th scope="col" class="col-created">Oprettet dato/af</th>
+                  <th scope="col" class="col-earned">Optjent</th>
+                  <th scope="col" class="col-used">Afviklet</th>
+                  <th scope="col" class="col-valid-from">Gyldig fra</th>
+                  <th scope="col" class="col-valid-to">Gyldig til</th>
+                  <th scope="col" class="col-note">Notat</th>
                 </tr>
               </thead>
               <tbody>
@@ -504,8 +504,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage1 === 1"
-                @click="prevPage1"
                 aria-label="Forrige side"
+                @click="prevPage1"
               >
                 <IconChevronLeft :size="14" :stroke-width="2.2" />
               </button>
@@ -515,8 +515,8 @@ onMounted(async () => {
                   v-else
                   class="page-btn"
                   :class="{ active: p === currentPage1 }"
-                  @click="goToPage1(p)"
                   :aria-current="p === currentPage1 ? 'page' : undefined"
+                  @click="goToPage1(p)"
                 >
                   {{ p }}
                 </button>
@@ -524,8 +524,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage1 === totalPages1"
-                @click="nextPage1"
                 aria-label="Næste side"
+                @click="nextPage1"
               >
                 <IconChevronRight :size="14" :stroke-width="2.2" />
               </button>
@@ -591,11 +591,11 @@ onMounted(async () => {
             >
               <thead>
                 <tr>
-                  <th class="col-instructor-created">Oprettet dato/af</th>
-                  <th class="col-period">Periode</th>
-                  <th class="col-duration">Varighed</th>
-                  <th class="col-category">Kategori</th>
-                  <th class="col-instructor-note">Notat</th>
+                  <th scope="col" class="col-instructor-created">Oprettet dato/af</th>
+                  <th scope="col" class="col-period">Periode</th>
+                  <th scope="col" class="col-duration">Varighed</th>
+                  <th scope="col" class="col-category">Kategori</th>
+                  <th scope="col" class="col-instructor-note">Notat</th>
                 </tr>
               </thead>
               <tbody>
@@ -642,8 +642,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage2 === 1"
-                @click="prevPage2"
                 aria-label="Forrige side"
+                @click="prevPage2"
               >
                 <IconChevronLeft :size="14" :stroke-width="2.2" />
               </button>
@@ -653,8 +653,8 @@ onMounted(async () => {
                   v-else
                   class="page-btn"
                   :class="{ active: p === currentPage2 }"
-                  @click="goToPage2(p)"
                   :aria-current="p === currentPage2 ? 'page' : undefined"
+                  @click="goToPage2(p)"
                 >
                   {{ p }}
                 </button>
@@ -662,8 +662,8 @@ onMounted(async () => {
               <button
                 class="page-btn"
                 :disabled="currentPage2 === totalPages2"
-                @click="nextPage2"
                 aria-label="Næste side"
+                @click="nextPage2"
               >
                 <IconChevronRight :size="14" :stroke-width="2.2" />
               </button>

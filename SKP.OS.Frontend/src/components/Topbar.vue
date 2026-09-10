@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IconChevronRight, IconUser, IconLogout } from '@tabler/icons-vue'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   isSidebarCollapsed?: boolean
   userName?: string
 }>(), {

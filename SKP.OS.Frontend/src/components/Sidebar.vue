@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted, computed } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
   IconHome, 
@@ -46,9 +47,9 @@ const tabRefs = new Map<string, HTMLElement>()
 const indicatorTop = ref(0)
 const hasInitialized = ref(false)
 
-const setTabRef = (name: string, el: any) => {
+const setTabRef = (name: string, el: Element | ComponentPublicInstance | null) => {
   if (el) {
-    const domEl = el.$el ?? el
+    const domEl = (el as ComponentPublicInstance).$el ?? el
     if (domEl instanceof HTMLElement) {
       tabRefs.set(name, domEl)
     }
@@ -131,7 +132,7 @@ onUnmounted(() => {
       }"
     /> 
 
-    <nav class="tabs-list">
+    <nav class="tabs-list" aria-label="Hovednavigation">
       <RouterLink
         v-for="tab in tabs"
         :key="tab.name"
