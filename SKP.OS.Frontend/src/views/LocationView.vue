@@ -836,11 +836,6 @@ onMounted(async () => {
   border-color: #93c5fd;
   background-color: #f8fafc;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
-}
-
-.location-card:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .location-card:focus-visible {
