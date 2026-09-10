@@ -509,7 +509,7 @@ onMounted(async () => {
 <template>
   <div class="page-container">
     <div class="page-header">
-      <h1 class="page-title">Underviser</h1>
+      <h1 class="page-title">Instruktør</h1>
       <div class="page-header-row">
         <p class="page-subtitle">Overblik over elever, lokationer og projekter</p>
         <button class="refresh-btn" @click="reloadAll">
@@ -525,7 +525,7 @@ onMounted(async () => {
 
     <template v-else>
       <div class="surface">
-        <nav class="tab-bar" aria-label="Underviser sektioner">
+        <nav class="tab-bar" aria-label="Instruktør sektioner">
           <button
             class="tab-btn"
             :class="{ active: activeTab === 'students' }"
@@ -756,7 +756,7 @@ onMounted(async () => {
                 <thead>
                   <tr>
                     <th>Dato</th>
-                    <th>Underviser</th>
+                    <th>Instruktør</th>
                     <th>Varighed</th>
                     <th>Note</th>
                     <th class="col-actions"></th>
