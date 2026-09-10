@@ -184,11 +184,6 @@ const emit = defineEmits<{
   white-space: nowrap;
 }
 
-.profile-label {
-  color: #6b7280;
-  font-weight: 500;
-}
-
 .profile-name {
   color: #111827;
   font-weight: 600;

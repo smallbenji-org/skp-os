@@ -667,60 +667,6 @@ const handleRegister = async () => {
   }
 }
 
-.form-footer {
-  margin-top: 14px;
-  min-height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.footer-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.footer-text {
-  font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: #016BFF;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.15s ease;
-}
-
-.link-btn:hover {
-  color: #004ec2;
-}
-
-.sub-fade-enter-active,
-.sub-fade-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.sub-fade-enter-from {
-  opacity: 0;
-  transform: translateY(4px);
-}
-
-.sub-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;

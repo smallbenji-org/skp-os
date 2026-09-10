@@ -415,30 +415,6 @@ onMounted(async () => {
   font-weight: 400;
 }
 
-.breadcrumbs {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12.5px;
-  color: #9ca3af;
-  user-select: none;
-}
-
-.breadcrumb-item {
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.breadcrumb-item.active {
-  color: #9ca3af;
-  font-weight: 600;
-}
-
-.breadcrumb-sep {
-  font-size: 11px;
-  color: #cbd5e1;
-}
-
 .toast-notification {
   position: fixed;
   top: 70px;
@@ -620,58 +596,6 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-.status-indicator-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  user-select: none;
-}
-
-.status-indicator-badge.active {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-}
-
-.status-indicator-badge.inactive {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.status-indicator-badge.active .status-dot {
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-  animation: pulse 2s infinite;
-}
-
-.status-indicator-badge.inactive .status-dot {
-  background: #94a3b8;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
 }
 
 .status-details {
@@ -935,10 +859,6 @@ onMounted(async () => {
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .breadcrumbs {
-    display: none;
   }
 
   .status-container {
