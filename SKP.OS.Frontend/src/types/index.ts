@@ -1,4 +1,5 @@
 export * from "./auth.types";
+export * from "./announcement.types";
 export * from "./check-in.types";
 export * from "./contract-type.types";
 export * from "./enums.types";

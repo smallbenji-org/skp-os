@@ -1,0 +1,14 @@
+namespace SKP.OS.Base.Models;
+
+public class Announcement
+{
+    public int Id { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Message { get; set; } = string.Empty;
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public bool IsActive { get; set; }
+}

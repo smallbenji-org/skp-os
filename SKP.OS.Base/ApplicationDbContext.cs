@@ -22,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<CheckIn> CheckIns { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<InfoEntry> InfoEntries { get; set; }
+    public DbSet<Announcement> Announcements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

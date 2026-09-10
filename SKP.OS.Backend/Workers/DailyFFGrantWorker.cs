@@ -60,7 +60,8 @@ public class DailyFFGrantWorker : BackgroundService
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             var now = DateTimeOffset.Now;
-            var dayStart = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
+            var localDayStart = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
+            var dayStart = localDayStart.ToUniversalTime();
             var dayEnd = dayStart.AddDays(1);
             var monthName = CultureInfo.GetCultureInfo("da-DK")
                 .DateTimeFormat.GetMonthName(now.Month);
@@ -99,7 +100,7 @@ public class DailyFFGrantWorker : BackgroundService
 
                 context.FFEntries.Add(new FFEntry
                 {
-                    Date = now,
+                    Date = DateTimeOffset.UtcNow,
                     Duration = TimeSpan.FromHours(3),
                     Note = note,
                     StudentProfileId = student.Id,

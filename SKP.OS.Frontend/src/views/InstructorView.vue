@@ -5,6 +5,7 @@ import {
   IconBuilding,
   IconFolderPlus,
   IconNotes,
+  IconBellPlus,
   IconClock,
   IconPlus,
   IconTrash,
@@ -24,7 +25,8 @@ import { useRoomStore } from "@/Stores/RoomStore";
 import { useProjectStore } from "@/Stores/ProjectStore";
 import { useProjectTemplateStore } from "@/Stores/ProjectTemplateStore";
 import { useInstructorProfileStore } from "@/Stores/InstructorProfileStore";
-import type { CheckInDto, FFEntryDto, ProjectHaul, StudentProfileDto, StudentType } from "@/types";
+import { useAnnouncementStore } from "@/Stores/AnnouncementStore";
+import type { AnnouncementDto, CheckInDto, FFEntryDto, ProjectHaul, StudentProfileDto, StudentType } from "@/types";
 
 const studentProfileStore = useStudentProfileStore();
 const checkInStore = useCheckInStore();
@@ -33,6 +35,7 @@ const roomStore = useRoomStore();
 const projectStore = useProjectStore();
 const projectTemplateStore = useProjectTemplateStore();
 const instructorProfileStore = useInstructorProfileStore();
+const announcementStore = useAnnouncementStore();
 
 const SCHOOL_START_MINUTES = 8 * 60;
 const LATE_GRACE_MINUTES = 15;
@@ -50,7 +53,7 @@ const today = new Date();
 const todayISO = today.toISOString().split("T")[0];
 
 const isLoading = ref(true);
-const activeTab = ref<"students" | "rooms" | "projects" | "templates">("students");
+const activeTab = ref<"students" | "rooms" | "projects" | "templates" | "announcements">("students");
 
 const summary = computed(() => {
   const studentsList = students.value;
@@ -424,6 +427,55 @@ async function deleteTemplate(id: number) {
   await projectTemplateStore.DELETE_PROJECT_TEMPLATE(id);
 }
 
+const announcements = computed(() =>
+  [...announcementStore.ANNOUNCEMENTS].sort((a, b) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  ),
+);
+
+const newAnnouncementTitle = ref("");
+const newAnnouncementMessage = ref("");
+const newAnnouncementActive = ref(true);
+const isSavingAnnouncement = ref(false);
+const announcementFeedback = ref<"idle" | "success" | "error">("idle");
+const announcementError = ref("");
+
+async function createAnnouncement() {
+  if (!newAnnouncementTitle.value.trim() || isSavingAnnouncement.value) return;
+  isSavingAnnouncement.value = true;
+  announcementFeedback.value = "idle";
+  announcementError.value = "";
+  const result = await announcementStore.CREATE_ANNOUNCEMENT({
+    title: newAnnouncementTitle.value.trim(),
+    message: newAnnouncementMessage.value.trim(),
+    isActive: newAnnouncementActive.value,
+  });
+  isSavingAnnouncement.value = false;
+  announcementFeedback.value = result ? "success" : "error";
+  if (result) {
+    newAnnouncementTitle.value = "";
+    newAnnouncementMessage.value = "";
+    newAnnouncementActive.value = true;
+  } else {
+    announcementError.value = "Kunne ikke oprette meddelelsen.";
+  }
+  window.setTimeout(() => {
+    announcementFeedback.value = "idle";
+  }, 3000);
+}
+
+async function toggleAnnouncementActive(announcement: AnnouncementDto) {
+  await announcementStore.UPDATE_ANNOUNCEMENT(announcement.id, {
+    title: announcement.title,
+    message: announcement.message,
+    isActive: !announcement.isActive,
+  });
+}
+
+async function deleteAnnouncement(id: number) {
+  await announcementStore.DELETE_ANNOUNCEMENT(id);
+}
+
 async function reloadAll() {
   await Promise.all([
     studentProfileStore.GET_STUDENT_PROFILES(),
@@ -433,6 +485,7 @@ async function reloadAll() {
     refreshProjects(),
     projectTemplateStore.GET_PROJECT_TEMPLATES(),
     instructorProfileStore.GET_MY_INSTRUCTOR_PROFILE(),
+    announcementStore.GET_ANNOUNCEMENTS(),
   ]);
 }
 
@@ -493,6 +546,14 @@ onMounted(async () => {
           >
             <IconNotes :size="16" :stroke-width="2" />
             Skabeloner
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'announcements' }"
+            @click="activeTab = 'announcements'"
+          >
+            <IconBellPlus :size="16" :stroke-width="2" />
+            Meddelelser
           </button>
         </nav>
 
@@ -962,7 +1023,7 @@ onMounted(async () => {
           </article>
         </section>
 
-        <section v-else class="tab-panel">
+        <section v-else-if="activeTab === 'templates'" class="tab-panel">
           <div class="section-heading">Opret skabelon</div>
           <form class="create-form" @submit.prevent="createTemplate">
             <div class="form-field">
@@ -1072,6 +1133,106 @@ onMounted(async () => {
                     class="icon-btn danger"
                     @click="deleteTemplate(template.id)"
                     aria-label="Slet skabelon"
+                  >
+                    <IconTrash :size="15" :stroke-width="2" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section v-else-if="activeTab === 'announcements'" class="tab-panel">
+          <div class="section-heading">Ny meddelelse</div>
+          <form class="create-form" @submit.prevent="createAnnouncement">
+            <div class="form-field">
+              <label class="form-label" for="announcement-title">Titel</label>
+              <input
+                id="announcement-title"
+                v-model="newAnnouncementTitle"
+                class="form-input"
+                type="text"
+                placeholder="fx Dagens besked"
+              />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="announcement-message">Besked</label>
+              <textarea
+                id="announcement-message"
+                v-model="newAnnouncementMessage"
+                class="form-input"
+                rows="3"
+                placeholder="Skriv meddelelsen til eleverne..."
+              />
+            </div>
+            <div class="form-field checkbox-field">
+              <label class="checkbox-label">
+                <input
+                  v-model="newAnnouncementActive"
+                  type="checkbox"
+                />
+                <span>Aktiv (vises for eleverne)</span>
+              </label>
+            </div>
+            <button
+              class="create-btn"
+              type="submit"
+              :disabled="!newAnnouncementTitle.trim() || isSavingAnnouncement"
+            >
+              <IconPlus :size="16" :stroke-width="2.5" />
+              Opret meddelelse
+            </button>
+            <span
+              v-if="announcementFeedback === 'success'"
+              class="save-feedback success"
+            >
+              <IconCheck :size="13" :stroke-width="2.5" /> Oprettet
+            </span>
+            <span
+              v-else-if="announcementFeedback === 'error'"
+              class="save-feedback error"
+            >
+              <IconAlertTriangle :size="13" :stroke-width="2" />
+              {{ announcementError }}
+            </span>
+          </form>
+
+          <div class="divider" />
+
+          <div class="section-heading">Aktuelle meddelelser</div>
+          <div v-if="announcements.length === 0" class="empty-card">Ingen meddelelser endnu.</div>
+          <table class="data-table" aria-label="Meddelelser">
+            <thead>
+              <tr>
+                <th>Titel</th>
+                <th>Besked</th>
+                <th>Oprettet</th>
+                <th>Status</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="announcement in announcements" :key="announcement.id">
+                <td class="cell-name">{{ announcement.title }}</td>
+                <td class="cell-note">{{ announcement.message || "—" }}</td>
+                <td class="cell-date">
+                  {{ new Date(announcement.createdAt).toLocaleDateString("da-DK") }}
+                </td>
+                <td>
+                  <button
+                    class="status-toggle-btn"
+                    :class="{ active: announcement.isActive }"
+                    @click="toggleAnnouncementActive(announcement)"
+                    :title="announcement.isActive ? 'Skjul meddelelse' : 'Vis meddelelse'"
+                  >
+                    {{ announcement.isActive ? "Aktiv" : "Skjult" }}
+                  </button>
+                </td>
+                <td class="cell-actions">
+                  <button
+                    class="icon-btn danger"
+                    @click="deleteAnnouncement(announcement.id)"
+                    aria-label="Slet meddelelse"
                   >
                     <IconTrash :size="15" :stroke-width="2" />
                   </button>
@@ -1297,6 +1458,37 @@ onMounted(async () => {
   text-align: center;
   color: #9ca3af;
   padding: 22px 10px !important;
+}
+
+.status-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.status-toggle-btn:hover {
+  background: #f8fafc;
+}
+
+.status-toggle-btn.active {
+  border-color: #059669;
+  color: #059669;
+}
+
+.status-toggle-btn.active:hover {
+  background: #ecfdf5;
 }
 
 .cell-name {
@@ -1630,6 +1822,18 @@ onMounted(async () => {
   color: #111827;
   outline: none;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+textarea.form-input {
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: vertical;
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
 }
 
 .form-select {
