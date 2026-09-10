@@ -684,6 +684,7 @@ onMounted(async () => {
                 <thead>
                   <tr>
                     <th>Dato</th>
+                    <th>Underviser</th>
                     <th>Varighed</th>
                     <th>Note</th>
                     <th class="col-actions"></th>
@@ -691,12 +692,13 @@ onMounted(async () => {
                 </thead>
                 <tbody>
                   <tr v-if="selectedEntries.length === 0">
-                    <td colspan="4" class="empty-row">Ingen FF registreringer.</td>
+                    <td colspan="5" class="empty-row">Ingen FF registreringer.</td>
                   </tr>
                   <tr v-for="entry in selectedEntries" :key="entry.id">
                     <td class="cell-date">
                       {{ new Date(entry.date).toLocaleDateString("da-DK") }}
                     </td>
+                    <td class="cell-note">{{ entry.instructorName || "—" }}</td>
                     <td class="cell-ff" :class="{ neg: parseDurationToSeconds(entry.duration) < 0 }">{{ formatClock(parseDurationToSeconds(entry.duration)) }}</td>
                     <td class="cell-note">{{ entry.note || "—" }}</td>
                     <td class="cell-actions">

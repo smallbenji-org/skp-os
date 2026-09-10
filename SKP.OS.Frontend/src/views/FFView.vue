@@ -95,12 +95,6 @@ const formattedBalance = computed(() => {
   return formatBalance(totalBalanceMinutes.value);
 });
 
-const balanceStatusClass = computed(() => {
-  if (totalBalanceMinutes.value < 0) return "negative";
-  if (totalBalanceMinutes.value > 37 * 60) return "warning";
-  return "normal";
-});
-
 function formatDate(dateStr?: string | null): string {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -128,6 +122,9 @@ function formatDateTime(dateStr?: string | null): string {
 
 function formatCreatedCell(entry: FFEntryDto): string {
   const dateFormatted = formatDate(entry.date);
+  if (entry.instructorName) {
+    return `${dateFormatted} / ${entry.instructorName}`;
+  }
   if (entry.createdBy) {
     return `${dateFormatted} / ${entry.createdBy}`;
   }

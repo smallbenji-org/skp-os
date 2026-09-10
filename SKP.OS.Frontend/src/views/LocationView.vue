@@ -3,7 +3,6 @@ import { ref, computed, onMounted, watchEffect } from "vue";
 import {
   IconInfoCircle,
   IconChevronDown,
-  IconMapPin,
   IconMapPinFilled,
   IconCheck,
   IconLogout,

@@ -4,6 +4,8 @@ export interface FFEntryDto {
     duration: string;
     note: string;
     studentProfileId: number;
+    instructorProfileId: number | null;
+    instructorName: string | null;
     createdBy?: string;
     validFrom?: string;
     validTo?: string;

@@ -12,6 +12,7 @@ export default defineConfig({
   },
   build: {
     outDir: '../SKP.OS.Backend/wwwroot',
+    emptyOutDir: true
   },
   server: {
     proxy: {

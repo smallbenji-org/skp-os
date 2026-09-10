@@ -12,4 +12,7 @@ public class FFEntry
 
     public int StudentProfileId { get; set; }
     public StudentProfile StudentProfile { get; set; }
+
+    public int? InstructorProfileId { get; set; }
+    public InstructorProfile? InstructorProfile { get; set; }
 }

@@ -81,6 +81,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(f => f.StudentProfileId);
 
+        builder.Entity<FFEntry>()
+            .HasOne(f => f.InstructorProfile)
+            .WithMany()
+            .HasForeignKey(f => f.InstructorProfileId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.Entity<CheckIn>()
             .HasOne(c => c.StudentProfile)
             .WithMany()

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
@@ -13,22 +14,27 @@ namespace SKP.OS.Backend.Controllers;
 public class FFEntryController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public FFEntryController(ApplicationDbContext context)
+    public FFEntryController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     /// <summary>Lists FVU/FF (grundforløb) entries, optionally filtered by student.</summary>
     /// <remarks>
     /// If <c>studentProfileId</c> is provided, only entries for that student are returned.
+    /// Each entry includes the instructor who granted/deducted the hours.
     /// Entries are ordered newest first. Requires: authenticated user.
     /// </remarks>
     /// <param name="studentProfileId">Optional. Filter to a single student profile.</param>
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int? studentProfileId = null)
     {
-        var query = _context.FFEntries.AsQueryable();
+        var query = _context.FFEntries
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .AsQueryable();
         if (studentProfileId.HasValue)
         {
             query = query.Where(f => f.StudentProfileId == studentProfileId.Value);
@@ -46,6 +52,7 @@ public class FFEntryController : ControllerBase
     public async Task<IActionResult> Get(int id)
     {
         var entry = await _context.FFEntries
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
             .FirstOrDefaultAsync(f => f.Id == id);
         if (entry == null)
         {
@@ -56,7 +63,8 @@ public class FFEntryController : ControllerBase
 
     /// <summary>Creates a new FF entry.</summary>
     /// <remarks>
-    /// Requires the referenced student profile to exist.
+    /// Requires the referenced student profile to exist. Grants or deducts FF hours for
+    /// the student and records the authenticated instructor as the one who made the change.
     /// <para>Requires: Instructor role.</para>
     /// <para>Returns 400 if the student profile does not exist.</para>
     /// </remarks>
@@ -71,17 +79,36 @@ public class FFEntryController : ControllerBase
             return BadRequest(new { message = "Student profile does not exist." });
         }
 
+        int? instructorProfileId = null;
+        var user = await _userManager.GetUserAsync(User);
+        if (user != null)
+        {
+            var instructorProfile = await _context.InstructorProfiles
+                .FirstOrDefaultAsync(ip => ip.ApplicationUserId == user.Id);
+            if (instructorProfile == null)
+            {
+                instructorProfile = new InstructorProfile { ApplicationUserId = user.Id };
+                _context.InstructorProfiles.Add(instructorProfile);
+                await _context.SaveChangesAsync();
+            }
+            instructorProfileId = instructorProfile.Id;
+        }
+
         var entry = new FFEntry
         {
             Date = dto.Date,
             Duration = dto.Duration,
             Note = dto.Note,
-            StudentProfileId = dto.StudentProfileId
+            StudentProfileId = dto.StudentProfileId,
+            InstructorProfileId = instructorProfileId
         };
         _context.FFEntries.Add(entry);
         await _context.SaveChangesAsync();
 
-        return Ok(new FFEntryDto(entry));
+        var created = await _context.FFEntries
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
+            .FirstAsync(f => f.Id == entry.Id);
+        return Ok(new FFEntryDto(created));
     }
 
     /// <summary>Updates an existing FF entry.</summary>
@@ -95,6 +122,7 @@ public class FFEntryController : ControllerBase
     public async Task<IActionResult> Update(int id, [FromBody] UpdateFFEntryDto dto)
     {
         var entry = await _context.FFEntries
+            .Include(f => f.InstructorProfile).ThenInclude(ip => ip.User)
             .FirstOrDefaultAsync(f => f.Id == id);
         if (entry == null)
         {
