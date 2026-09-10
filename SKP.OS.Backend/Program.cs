@@ -122,6 +122,12 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
+if (string.IsNullOrWhiteSpace(settings.ConnectionString))
+{
+    throw new InvalidOperationException(
+        "Database:ConnectionString is not configured. Provide it via user-secrets or an environment variable.");
+}
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
