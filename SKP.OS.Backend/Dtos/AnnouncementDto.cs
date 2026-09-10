@@ -11,6 +11,7 @@ public class AnnouncementDto
         Id = announcement.Id;
         Title = announcement.Title;
         Message = announcement.Message;
+        Date = announcement.Date;
         CreatedAt = announcement.CreatedAt;
         IsActive = announcement.IsActive;
     }
@@ -18,6 +19,7 @@ public class AnnouncementDto
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    public DateTimeOffset Date { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public bool IsActive { get; set; }
 }
@@ -26,6 +28,7 @@ public class CreateAnnouncementDto
 {
     public string Title { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    public DateTimeOffset Date { get; set; }
     public bool IsActive { get; set; } = true;
 }
 
@@ -33,5 +36,6 @@ public class UpdateAnnouncementDto
 {
     public string Title { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    public DateTimeOffset Date { get; set; }
     public bool IsActive { get; set; }
 }

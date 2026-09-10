@@ -63,6 +63,7 @@ public class AnnouncementController : ControllerBase
         {
             Title = dto.Title,
             Message = dto.Message,
+            Date = dto.Date == default ? DateTimeOffset.UtcNow : dto.Date,
             CreatedAt = DateTimeOffset.UtcNow,
             IsActive = dto.IsActive
         };
@@ -96,6 +97,7 @@ public class AnnouncementController : ControllerBase
 
         announcement.Title = dto.Title;
         announcement.Message = dto.Message;
+        announcement.Date = dto.Date == default ? announcement.Date : dto.Date;
         announcement.IsActive = dto.IsActive;
         await _context.SaveChangesAsync();
 

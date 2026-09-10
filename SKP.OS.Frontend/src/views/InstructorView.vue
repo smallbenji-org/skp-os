@@ -428,13 +428,21 @@ async function deleteTemplate(id: number) {
 }
 
 const announcements = computed(() =>
-  [...announcementStore.ANNOUNCEMENTS].sort((a, b) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  [...announcementStore.ANNOUNCEMENTS].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   ),
 );
 
+const todayLocal = (() => {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+})();
+
 const newAnnouncementTitle = ref("");
 const newAnnouncementMessage = ref("");
+const newAnnouncementDate = ref(todayLocal);
 const newAnnouncementActive = ref(true);
 const isSavingAnnouncement = ref(false);
 const announcementFeedback = ref<"idle" | "success" | "error">("idle");
@@ -448,6 +456,7 @@ async function createAnnouncement() {
   const result = await announcementStore.CREATE_ANNOUNCEMENT({
     title: newAnnouncementTitle.value.trim(),
     message: newAnnouncementMessage.value.trim(),
+    date: new Date(`${newAnnouncementDate.value}T12:00:00`).toISOString(),
     isActive: newAnnouncementActive.value,
   });
   isSavingAnnouncement.value = false;
@@ -455,6 +464,7 @@ async function createAnnouncement() {
   if (result) {
     newAnnouncementTitle.value = "";
     newAnnouncementMessage.value = "";
+    newAnnouncementDate.value = todayLocal;
     newAnnouncementActive.value = true;
   } else {
     announcementError.value = "Kunne ikke oprette meddelelsen.";
@@ -468,6 +478,7 @@ async function toggleAnnouncementActive(announcement: AnnouncementDto) {
   await announcementStore.UPDATE_ANNOUNCEMENT(announcement.id, {
     title: announcement.title,
     message: announcement.message,
+    date: announcement.date,
     isActive: !announcement.isActive,
   });
 }
@@ -1156,6 +1167,15 @@ onMounted(async () => {
               />
             </div>
             <div class="form-field">
+              <label class="form-label" for="announcement-date">Dato</label>
+              <input
+                id="announcement-date"
+                v-model="newAnnouncementDate"
+                class="form-input"
+                type="date"
+              />
+            </div>
+            <div class="form-field">
               <label class="form-label" for="announcement-message">Besked</label>
               <textarea
                 id="announcement-message"
@@ -1206,7 +1226,7 @@ onMounted(async () => {
               <tr>
                 <th>Titel</th>
                 <th>Besked</th>
-                <th>Oprettet</th>
+                <th>Dato</th>
                 <th>Status</th>
                 <th class="col-actions"></th>
               </tr>
@@ -1216,7 +1236,7 @@ onMounted(async () => {
                 <td class="cell-name">{{ announcement.title }}</td>
                 <td class="cell-note">{{ announcement.message || "—" }}</td>
                 <td class="cell-date">
-                  {{ new Date(announcement.createdAt).toLocaleDateString("da-DK") }}
+                  {{ new Date(announcement.date).toLocaleDateString("da-DK") }}
                 </td>
                 <td>
                   <button
