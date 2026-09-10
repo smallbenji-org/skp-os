@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
 using SKP.OS.Base.Models;
@@ -41,6 +42,7 @@ public class AuthController : ControllerBase
     /// </remarks>
     [HttpPost("register")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
         var role = string.IsNullOrWhiteSpace(dto.Role) ? "Student" : dto.Role;
@@ -90,6 +92,7 @@ public class AuthController : ControllerBase
     /// </remarks>
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         var user = await _userManager.FindByNameAsync(dto.UserName)

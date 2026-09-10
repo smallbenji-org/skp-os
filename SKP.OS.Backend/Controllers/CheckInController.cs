@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
 using SKP.OS.Backend.Networking;
@@ -89,6 +90,7 @@ public class CheckInController : ControllerBase
     /// <para>Returns 400 if the student profile or room does not exist, 403 if the student is blocked from checking in.</para>
     /// </remarks>
     [HttpPost]
+    [EnableRateLimiting("checkin")]
     public async Task<IActionResult> Create([FromBody] CreateCheckInDto dto)
     {
         var clientIp = GetClientIp();
