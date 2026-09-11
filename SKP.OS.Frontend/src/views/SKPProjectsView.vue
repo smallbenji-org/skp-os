@@ -47,7 +47,6 @@ onMounted(async () => {
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">SKP Projekter</h1>
-      <p class="page-sub">Projekter du arbejder på under skolepraktik og hovedforløb</p>
     </div>
 
     <div v-if="isLoading" class="skeleton-surface" />

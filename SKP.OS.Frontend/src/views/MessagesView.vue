@@ -32,7 +32,6 @@ onMounted(async () => {
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">Aktuelle Meddelelser</h1>
-      <p class="page-sub">Nyheder og opslag fra underviserne</p>
     </div>
 
     <div v-if="isLoading" class="skeleton-surface" />
@@ -100,9 +99,9 @@ onMounted(async () => {
 .announcement-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 0;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 6px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .announcement-item:first-child {

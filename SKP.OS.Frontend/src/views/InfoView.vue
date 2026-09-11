@@ -34,7 +34,6 @@ onMounted(async () => {
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">Information</h1>
-      <p class="page-sub">Fastgjorte og nyeste opslag</p>
     </div>
 
     <div v-if="isLoading" class="skeleton-surface" />
