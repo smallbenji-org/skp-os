@@ -26,7 +26,6 @@ onMounted(async () => {
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">Indstillinger</h1>
-      <p class="page-sub">Dine konti-oplysninger og profildetaljer</p>
     </div>
 
     <div v-if="isLoading" class="skeleton-surface" />
@@ -98,12 +97,6 @@ onMounted(async () => {
   font-weight: 700;
   color: #111827;
   letter-spacing: -0.5px;
-  margin: 0;
-}
-
-.page-sub {
-  font-size: 15px;
-  color: #6b7280;
   margin: 0;
 }
 

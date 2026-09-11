@@ -74,12 +74,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-.page-sub {
-  font-size: 15px;
-  color: #6b7280;
-  margin: 0;
-}
-
 .surface {
   background: #ffffff;
   border: 1px solid #e5e7eb;

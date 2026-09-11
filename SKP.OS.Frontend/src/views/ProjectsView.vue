@@ -69,9 +69,6 @@ onMounted(async () => {
       <div class="page-header-row">
         <div class="page-header-text">
           <h1 class="page-title">Mine Projekter</h1>
-          <p class="page-sub">
-            Opret et projekt ud fra en SKP-skabelon, eller se de projekter du er tilknyttet
-          </p>
         </div>
         <button
           v-if="hasTemplates"
@@ -178,11 +175,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-.page-sub {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 0;
-}
 
 .new-project-btn {
   display: inline-flex;

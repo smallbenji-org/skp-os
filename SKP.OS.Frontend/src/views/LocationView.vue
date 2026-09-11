@@ -802,7 +802,7 @@ onMounted(async () => {
 }
 
 .pin-badge.active {
-  background: #dcfce7;
+  background: #b3ffce;
   color: #16a34a;
 }
 
