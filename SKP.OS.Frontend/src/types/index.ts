@@ -8,6 +8,7 @@ export * from "./info-entry.types";
 export * from "./instructor-profile.types";
 export * from "./logbook-entry.types";
 export * from "./project-haul.types";
+export * from "./project-stage.types";
 export * from "./project-template.types";
 export * from "./project.types";
 export * from "./room.types";

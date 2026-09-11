@@ -16,6 +16,7 @@ public class ProjectDto
         Perspektivering = project.Perspektivering;
         GitRepoUrl = project.GitRepoUrl;
         IsCustomProject = project.IsCustomProject;
+        Stage = project.Stage;
         ProjectTemplateId = project.ProjectTemplateId;
         ProjectTemplate = project.ProjectTemplate != null ? new ProjectTemplateDto(project.ProjectTemplate) : null;
     }
@@ -28,6 +29,7 @@ public class ProjectDto
     public string Perspektivering { get; set; } = string.Empty;
     public string GitRepoUrl { get; set; } = string.Empty;
     public bool IsCustomProject { get; set; }
+    public ProjectStage Stage { get; set; }
     public int? ProjectTemplateId { get; set; }
     public ProjectTemplateDto? ProjectTemplate { get; set; }
     public List<StudentProfileDto> Students { get; set; } = [];
@@ -40,6 +42,11 @@ public class CreateProjectDto
     public string GitRepoUrl { get; set; } = string.Empty;
     public bool IsCustomProject { get; set; }
     public int? ProjectTemplateId { get; set; }
+}
+
+public class UpdateProjectStageDto
+{
+    public ProjectStage Stage { get; set; }
 }
 
 public class UpdateProjectDto

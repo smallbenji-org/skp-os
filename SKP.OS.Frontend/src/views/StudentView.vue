@@ -15,6 +15,7 @@ import { useFFEntryStore } from "@/Stores/FFEntryStore";
 import { useProjectStore } from "@/Stores/ProjectStore";
 import { useCheckInStore } from "@/Stores/CheckInStore";
 import { useAuthStore } from "@/Stores/AuthStore";
+import ProjectStageBadge from "@/components/ProjectStageBadge.vue";
 import type { CheckInDto, ProjectDto, StudentProfileDto } from "@/types";
 
 const authStore = useAuthStore();
@@ -288,6 +289,7 @@ onMounted(async () => {
                 {{ project.shortDescription || "Ingen beskrivelse" }}
               </span>
             </div>
+            <ProjectStageBadge :stage="project.stage" size="sm" />
           </div>
         </template>
         <p v-else class="empty-text">Du er endnu ikke tilknyttet et projekt.</p>

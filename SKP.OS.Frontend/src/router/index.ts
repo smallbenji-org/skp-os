@@ -32,6 +32,11 @@ const router = createRouter({
           component: () => import('@/views/ProjectsView.vue'),
         },
         {
+          path: 'projekter/:id',
+          name: 'projekt-detalje',
+          component: () => import('@/views/ProjectDetailView.vue'),
+        },
+        {
           path: 'skp-projekter',
           name: 'skp-projekter',
           component: () => import('@/views/SKPProjectsView.vue'),

@@ -10,6 +10,7 @@ public class Project : ISoftDeletable
     public string Perspektivering { get; set; } = string.Empty;
     public string GitRepoUrl { get; set; } = string.Empty;
     public bool IsCustomProject { get; set; }
+    public ProjectStage Stage { get; set; } = ProjectStage.Created;
     public bool IsDeleted { get; set; }
 
     public int? ProjectTemplateId { get; set; }

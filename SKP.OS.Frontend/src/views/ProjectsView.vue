@@ -5,10 +5,12 @@ import {
   IconPlus,
   IconExternalLink,
   IconUsers,
+  IconArrowRight,
 } from "@tabler/icons-vue";
 import { useProjectStore } from "@/Stores/ProjectStore";
 import { useStudentProfileStore } from "@/Stores/StudentProfileStore";
 import { useProjectTemplateStore } from "@/Stores/ProjectTemplateStore";
+import ProjectStageBadge from "@/components/ProjectStageBadge.vue";
 
 const router = useRouter();
 const projectStore = useProjectStore();
@@ -42,6 +44,10 @@ function openRepo(url: string) {
 
 function goToTemplates() {
   router.push({ name: "skp-projekter" });
+}
+
+function openProject(projectId: number) {
+  router.push({ name: "projekt-detalje", params: { id: projectId } });
 }
 
 onMounted(async () => {
@@ -97,6 +103,7 @@ onMounted(async () => {
       <article v-for="project in myProjects" :key="project.id" class="surface project-card">
         <div class="project-heading">
           <h2 class="project-title">{{ project.title }}</h2>
+          <ProjectStageBadge :stage="project.stage" />
           <span
             v-if="project.projectTemplate || project.isCustomProject"
             class="template-badge"
@@ -110,16 +117,26 @@ onMounted(async () => {
             <IconUsers :size="16" :stroke-width="2" />
             {{ studentNames(project.students) }}
           </span>
-          <button
-            v-if="project.gitRepoUrl && /^https?:/i.test(project.gitRepoUrl.trim())"
-            type="button"
-            class="repo-link"
-            :title="project.gitRepoUrl"
-            @click="openRepo(project.gitRepoUrl)"
-          >
-            <IconExternalLink :size="16" :stroke-width="2" />
-            Repo
-          </button>
+          <div class="meta-actions">
+            <button
+              v-if="project.gitRepoUrl && /^https?:/i.test(project.gitRepoUrl.trim())"
+              type="button"
+              class="repo-link"
+              :title="project.gitRepoUrl"
+              @click="openRepo(project.gitRepoUrl)"
+            >
+              <IconExternalLink :size="16" :stroke-width="2" />
+              Repo
+            </button>
+            <button
+              type="button"
+              class="open-btn"
+              @click="openProject(project.id)"
+            >
+              Åbn projekt
+              <IconArrowRight :size="14" :stroke-width="2" />
+            </button>
+          </div>
         </div>
       </article>
     </div>
@@ -277,6 +294,33 @@ onMounted(async () => {
   font-size: 13px;
   color: #6b7280;
   min-width: 0;
+}
+
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #016bff;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-family: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.open-btn:hover {
+  background: #005ae0;
 }
 
 .repo-link {

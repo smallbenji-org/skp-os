@@ -155,7 +155,8 @@ public class ProjectController : ControllerBase
     /// <summary>Updates an existing project.</summary>
     /// <remarks>
     /// Updates all editable project fields. Passing <c>projectTemplateId</c> requires an existing template.
-    /// <para>Returns 404 if the project does not exist, 400 if the template does not exist.</para>
+    /// <para>Only instructors or students assigned to the project may update it.</para>
+    /// <para>Returns 404 if the project does not exist, 400 if the template does not exist, 403 for unauthorized users.</para>
     /// </remarks>
     /// <param name="id">The id of the project.</param>
     [HttpPut("{id:int}")]
@@ -163,10 +164,16 @@ public class ProjectController : ControllerBase
     {
         var project = await _context.Projects
             .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
             return NotFound(new { message = "Project not found." });
+        }
+
+        if (!await CanEditProject(project))
+        {
+            return Forbid();
         }
 
         if (dto.ProjectTemplateId != null)
@@ -190,6 +197,117 @@ public class ProjectController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new ProjectDto(project));
+    }
+
+    /// <summary>Submits a project on behalf of an assigned student.</summary>
+    /// <remarks>
+    /// Saves the student's project fields and moves the project from <c>Approved</c> to
+    /// <c>Submitted</c>.
+    /// <para>Only a student assigned to the project may submit it, and only after the instructor has approved it.</para>
+    /// <para>Returns 404 if the project does not exist, 403 for unauthorized users, 400 if the project is not approved.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
+    [HttpPost("{id:int}/submit")]
+    public async Task<IActionResult> Submit(int id, [FromBody] UpdateProjectDto dto)
+    {
+        var project = await _context.Projects
+            .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (project == null)
+        {
+            return NotFound(new { message = "Project not found." });
+        }
+
+        var student = await CurrentUserStudent();
+        if (student == null || project.Students?.Any(s => s.Id == student.Id) != true)
+        {
+            return Forbid();
+        }
+
+        if (project.Stage != ProjectStage.Approved)
+        {
+            return BadRequest(new { message = "Project must be approved before it can be submitted." });
+        }
+
+        project.Title = dto.Title;
+        project.ShortDescription = dto.ShortDescription;
+        project.Evaluation = dto.Evaluation;
+        project.Conclusion = dto.Conclusion;
+        project.Perspektivering = dto.Perspektivering;
+        project.GitRepoUrl = dto.GitRepoUrl;
+        project.IsCustomProject = dto.IsCustomProject;
+        project.ProjectTemplateId = dto.ProjectTemplateId;
+        project.Stage = ProjectStage.Submitted;
+        await _context.SaveChangesAsync();
+
+        return Ok(new ProjectDto(project)
+        {
+            Students = project.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? []
+        });
+    }
+
+    /// <summary>Changes a project's stage.</summary>
+    /// <remarks>
+    /// Stages must change step by step: forward only to the immediately following stage
+    /// (Created → Approved → Submitted → Evaluated), while going backwards is always allowed.
+    /// <para>Returns 404 if the project does not exist, 400 for an invalid transition.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
+    [HttpPut("{id:int}/stage")]
+    [Authorize(Roles = "Instructor")]
+    public async Task<IActionResult> UpdateStage(int id, [FromBody] UpdateProjectStageDto dto)
+    {
+        var project = await _context.Projects
+            .Include(p => p.ProjectTemplate)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (project == null)
+        {
+            return NotFound(new { message = "Project not found." });
+        }
+
+        if (!IsValidStageTransition(project.Stage, dto.Stage))
+        {
+            return BadRequest(new { message = $"Stages must change step by step. Cannot move from {project.Stage} to {dto.Stage}." });
+        }
+
+        project.Stage = dto.Stage;
+        await _context.SaveChangesAsync();
+
+        return Ok(new ProjectDto(project));
+    }
+
+    private static bool IsValidStageTransition(ProjectStage current, ProjectStage next)
+    {
+        if (current == next)
+        {
+            return false;
+        }
+        return next < current || next == current + 1;
+    }
+
+    private async Task<bool> CanEditProject(Project project)
+    {
+        if (User.IsInRole("Instructor"))
+        {
+            return true;
+        }
+
+        var student = await CurrentUserStudent();
+        return student != null && project.Students?.Any(s => s.Id == student.Id) == true;
+    }
+
+    private async Task<StudentProfile?> CurrentUserStudent()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return await _context.StudentProfiles
+            .Include(sp => sp.User)
+            .FirstOrDefaultAsync(sp => sp.ApplicationUserId == user.Id);
     }
 
     /// <summary>Deletes a project.</summary>

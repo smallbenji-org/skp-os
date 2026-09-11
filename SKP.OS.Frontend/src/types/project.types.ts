@@ -1,5 +1,6 @@
 import type { StudentProfileDto } from "./student-profile.types";
 import type { ProjectTemplateDto } from "./project-template.types";
+import type { ProjectStage } from "./project-stage.types";
 
 export interface ProjectDto {
     id: number;
@@ -10,6 +11,7 @@ export interface ProjectDto {
     perspektivering: string;
     gitRepoUrl: string;
     isCustomProject: boolean;
+    stage: ProjectStage;
     projectTemplateId: number | null;
     projectTemplate: ProjectTemplateDto | null;
     students: StudentProfileDto[];

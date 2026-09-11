@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import type { CreateProjectDto, ProjectDto, UpdateProjectDto } from "@/types";
+import type { CreateProjectDto, ProjectDto, ProjectStage, UpdateProjectDto } from "@/types";
 import { api } from "./api";
 
 export default class ProjectService {
@@ -58,6 +58,32 @@ export default class ProjectService {
         url: `/api/project/${id}`,
         method: "PUT",
         data
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public async submitProject(id: number, data: UpdateProjectDto): Promise<ProjectDto | null> {
+    try {
+      const response: AxiosResponse<ProjectDto> = await api({
+        url: `/api/project/${id}/submit`,
+        method: "POST",
+        data
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public async updateProjectStage(id: number, stage: ProjectStage): Promise<ProjectDto | null> {
+    try {
+      const response: AxiosResponse<ProjectDto> = await api({
+        url: `/api/project/${id}/stage`,
+        method: "PUT",
+        data: { stage }
       });
       return response.data ? response.data : null;
     } catch {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import {
   IconUsers,
   IconBuilding,
   IconFolderPlus,
+  IconFolderOpen,
   IconNotes,
   IconBellPlus,
   IconClock,
@@ -26,9 +28,12 @@ import { useProjectStore } from "@/Stores/ProjectStore";
 import { useProjectTemplateStore } from "@/Stores/ProjectTemplateStore";
 import { useInstructorProfileStore } from "@/Stores/InstructorProfileStore";
 import { useAnnouncementStore } from "@/Stores/AnnouncementStore";
-import type { AnnouncementDto, CheckInDto, ContractType, FFEntryDto, ProjectHaul, StudentProfileDto, StudentType } from "@/types";
+import ProjectStageBadge from "@/components/ProjectStageBadge.vue";
+import { STAGE_ORDER } from "@/utils/project-stage";
+import type { AnnouncementDto, CheckInDto, ContractType, FFEntryDto, ProjectHaul, ProjectStage, StudentProfileDto, StudentType } from "@/types";
 
 const studentProfileStore = useStudentProfileStore();
+const router = useRouter();
 const checkInStore = useCheckInStore();
 const ffEntryStore = useFFEntryStore();
 const roomStore = useRoomStore();
@@ -419,6 +424,33 @@ async function unassignStudent(projectId: number, studentId: number) {
 
 async function refreshProjects() {
   await projectStore.GET_PROJECTS();
+}
+
+const stageBusy = ref<number | null>(null);
+const stageError = ref<Record<number, string>>({});
+
+function previousStage(stage: ProjectStage): ProjectStage | null {
+  const idx = STAGE_ORDER.indexOf(stage);
+  return idx > 0 ? STAGE_ORDER[idx - 1] : null;
+}
+
+async function changeStage(projectId: number, stage: ProjectStage) {
+  if (stageBusy.value != null) return;
+  stageBusy.value = projectId;
+  const updated = await projectStore.UPDATE_PROJECT_STAGE(projectId, stage);
+  stageBusy.value = null;
+  if (updated) {
+    stageError.value = { ...stageError.value, [projectId]: "" };
+  } else {
+    stageError.value = { ...stageError.value, [projectId]: "Kunne ikke ændre stadie." };
+    window.setTimeout(() => {
+      stageError.value = { ...stageError.value, [projectId]: "" };
+    }, 3000);
+  }
+}
+
+function openProject(projectId: number) {
+  router.push({ name: "projekt-detalje", params: { id: projectId } });
 }
 
 const templates = computed(() =>
@@ -1128,9 +1160,12 @@ onMounted(async () => {
           >
             <div class="project-head">
               <div class="project-title">{{ project.title }}</div>
-              <span class="project-tag" :class="{ custom: project.isCustomProject }">
-                {{ project.isCustomProject ? "Eget" : project.projectTemplate?.title ?? "Skabelon" }}
-              </span>
+              <div class="project-head-right">
+                <ProjectStageBadge :stage="project.stage" size="sm" />
+                <span class="project-tag" :class="{ custom: project.isCustomProject }">
+                  {{ project.isCustomProject ? "Eget" : project.projectTemplate?.title ?? "Skabelon" }}
+                </span>
+              </div>
             </div>
             <p class="project-desc">
               {{ project.shortDescription || "Ingen beskrivelse." }}
@@ -1181,6 +1216,51 @@ onMounted(async () => {
                   Tilføj
                 </button>
               </div>
+            </div>
+
+            <div class="stage-actions">
+              <button
+                class="stage-btn review"
+                type="button"
+                @click="openProject(project.id)"
+              >
+                <IconFolderOpen :size="14" :stroke-width="2" />
+                Gennemgå
+              </button>
+              <button
+                v-if="project.stage === 'Created'"
+                class="stage-btn approve"
+                type="button"
+                :disabled="stageBusy != null"
+                @click="changeStage(project.id, 'Approved')"
+              >
+                <IconCheck :size="14" :stroke-width="2.5" />
+                Godkend
+              </button>
+              <button
+                v-if="project.stage === 'Submitted'"
+                class="stage-btn evaluate"
+                type="button"
+                :disabled="stageBusy != null"
+                @click="changeStage(project.id, 'Evaluated')"
+              >
+                <IconCheck :size="14" :stroke-width="2.5" />
+                Evaluér
+              </button>
+              <button
+                v-if="project.stage !== 'Created'"
+                class="stage-btn back"
+                type="button"
+                :disabled="stageBusy != null"
+                @click="changeStage(project.id, previousStage(project.stage)!)"
+              >
+                <IconX :size="14" :stroke-width="2" />
+                Fortryd
+              </button>
+              <span v-if="stageError[project.id]" class="stage-error">
+                <IconAlertTriangle :size="13" :stroke-width="2" />
+                {{ stageError[project.id] }}
+              </span>
             </div>
           </article>
         </section>
@@ -2112,6 +2192,13 @@ textarea.form-input {
   flex-wrap: wrap;
 }
 
+.project-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .project-title {
   font-size: 14px;
   font-weight: 700;
@@ -2223,6 +2310,91 @@ textarea.form-input {
 .assign-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.stage-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.stage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.stage-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #111827;
+}
+
+.stage-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stage-btn.approve {
+  border-color: #016bff;
+  color: #016bff;
+}
+
+.stage-btn.approve:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.stage-btn.review {
+  border-color: #016bff;
+  color: #016bff;
+  background: #eff6ff;
+}
+
+.stage-btn.review:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.stage-btn.evaluate {
+  border-color: #059669;
+  color: #059669;
+}
+
+.stage-btn.evaluate:hover:not(:disabled) {
+  background: #ecfdf5;
+}
+
+.stage-btn.back {
+  border-color: #e2e8f0;
+  color: #6b7280;
+}
+
+.stage-btn.back:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #374151;
+}
+
+.stage-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
 }
 
 .empty-card {
