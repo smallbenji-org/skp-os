@@ -277,6 +277,37 @@ public class ProjectController : ControllerBase
         return Ok(new ProjectDto(project));
     }
 
+    /// <summary>Updates the instructor feedback for a project.</summary>
+    /// <remarks>
+    /// Sets the feedback shown to the assigned students. Feedback can only be given after the
+    /// project has been submitted.
+    /// <para>Only instructors may update feedback.</para>
+    /// <para>Returns 404 if the project does not exist, 400 if the project is not yet submitted.</para>
+    /// </remarks>
+    /// <param name="id">The id of the project.</param>
+    [HttpPut("{id:int}/feedback")]
+    [Authorize(Roles = "Instructor")]
+    public async Task<IActionResult> UpdateFeedback(int id, [FromBody] UpdateProjectFeedbackDto dto)
+    {
+        var project = await _context.Projects
+            .Include(p => p.ProjectTemplate)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (project == null)
+        {
+            return NotFound(new { message = "Project not found." });
+        }
+
+        if (project.Stage == ProjectStage.Created || project.Stage == ProjectStage.Approved)
+        {
+            return BadRequest(new { message = "Feedback can only be given after the project has been submitted." });
+        }
+
+        project.Feedback = dto.Feedback;
+        await _context.SaveChangesAsync();
+
+        return Ok(new ProjectDto(project));
+    }
+
     private static bool IsValidStageTransition(ProjectStage current, ProjectStage next)
     {
         if (current == next)

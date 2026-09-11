@@ -9,6 +9,7 @@ import {
   IconUsers,
   IconFolderOpen,
   IconX,
+  IconMessage,
 } from "@tabler/icons-vue";
 import { useProjectStore } from "@/Stores/ProjectStore";
 import { useAuthStore } from "@/Stores/AuthStore";
@@ -33,6 +34,8 @@ const saveFeedback = ref<"idle" | "success" | "error">("idle");
 const submitFeedback = ref<"idle" | "success" | "error">("idle");
 const stageBusy = ref(false);
 const stageError = ref("");
+const feedbackDraft = ref("");
+const feedbackSaveFeedback = ref<"idle" | "saving" | "success" | "error">("idle");
 
 const isStudent = computed(() => authStore.HAS_ROLE("Student"));
 const isInstructor = computed(() => authStore.HAS_ROLE("Instructor"));
@@ -82,6 +85,12 @@ const locked = computed(() => {
   return stage === "Submitted" || stage === "Evaluated";
 });
 
+const canGiveFeedback = computed(
+  () =>
+    isInstructor.value &&
+    (project.value?.stage === "Submitted" || project.value?.stage === "Evaluated"),
+);
+
 function applyProject() {
   const p = project.value;
   if (!p) return;
@@ -93,6 +102,7 @@ function applyProject() {
   form.gitRepoUrl = p.gitRepoUrl;
   form.isCustomProject = p.isCustomProject;
   form.projectTemplateId = p.projectTemplateId;
+  feedbackDraft.value = p.feedback ?? "";
 }
 
 async function load() {
@@ -128,6 +138,20 @@ async function submitProject() {
   window.setTimeout(() => {
     submitFeedback.value = "idle";
   }, 4000);
+}
+
+async function saveInstructorFeedback() {
+  if (!project.value || feedbackSaveFeedback.value === "saving") return;
+  feedbackSaveFeedback.value = "saving";
+  const updated = await projectStore.UPDATE_PROJECT_FEEDBACK(
+    project.value.id,
+    feedbackDraft.value.trim() === "" ? null : feedbackDraft.value,
+  );
+  feedbackSaveFeedback.value = updated ? "success" : "error";
+  if (updated) applyProject();
+  window.setTimeout(() => {
+    feedbackSaveFeedback.value = "idle";
+  }, 3000);
 }
 
 function previousStage(stage: ProjectStage): ProjectStage | null {
@@ -242,6 +266,14 @@ onMounted(async () => {
         </span>
       </div>
 
+      <div v-if="showStudentForm && project.feedback" class="surface feedback-banner">
+        <div class="feedback-banner-head">
+          <IconMessage :size="16" :stroke-width="2.5" />
+          Feedback fra underviser
+        </div>
+        <p class="feedback-banner-text">{{ project.feedback }}</p>
+      </div>
+
       <div v-if="showReview" class="surface review-card">
           <div class="section-heading">Gennemgang af projekt</div>
 
@@ -260,6 +292,36 @@ onMounted(async () => {
           <div class="review-row">
             <div class="review-label">Perspektivering</div>
             <p class="review-text">{{ project.perspektivering || "Ikke udfyldt." }}</p>
+          </div>
+        </div>
+
+        <div v-if="canGiveFeedback" class="surface feedback-card">
+          <div class="section-heading">Feedback til elever</div>
+          <textarea
+            v-model="feedbackDraft"
+            class="form-input"
+            rows="5"
+            placeholder="Skriv feedback til eleverne her..."
+            :disabled="isSaving"
+          />
+          <div class="feedback-actions">
+            <button
+              class="create-btn"
+              type="button"
+              :disabled="feedbackSaveFeedback === 'saving'"
+              @click="saveInstructorFeedback"
+            >
+              <IconCheck :size="15" :stroke-width="2.5" />
+              Gem feedback
+            </button>
+            <span v-if="feedbackSaveFeedback === 'success'" class="save-feedback success">
+              <IconCheck :size="13" :stroke-width="2.5" />
+              Feedback gemt
+            </span>
+            <span v-else-if="feedbackSaveFeedback === 'error'" class="save-feedback error">
+              <IconAlertTriangle :size="13" :stroke-width="2" />
+              Kunne ikke gemme feedback
+            </span>
           </div>
         </div>
 
@@ -581,11 +643,45 @@ onMounted(async () => {
 
 .review-card,
 .form-card,
-.stage-card {
+.stage-card,
+.feedback-card {
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 22px;
+}
+
+.feedback-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.feedback-banner-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.feedback-banner-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #1e3a8a;
+  white-space: pre-wrap;
+}
+
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .section-heading {

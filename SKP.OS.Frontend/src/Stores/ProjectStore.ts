@@ -67,6 +67,15 @@ export const useProjectStore = defineStore("project", () => {
     return updated;
   }
 
+  async function UPDATE_PROJECT_FEEDBACK(id: number, feedback: string | null) {
+    const updated = await projectService.updateProjectFeedback(id, feedback);
+    if (updated) {
+      await GET_PROJECTS();
+      SelectedProject.value = updated;
+    }
+    return updated;
+  }
+
   async function DELETE_PROJECT(id: number) {
     const success = await projectService.deleteProject(id);
     if (success) {
@@ -94,7 +103,7 @@ export const useProjectStore = defineStore("project", () => {
   return {
     Projects, SelectedProject,
     PROJECTS, SELECTED_PROJECT,
-    GET_PROJECTS, GET_PROJECT, CREATE_PROJECT, CREATE_PROJECT_FROM_TEMPLATE, UPDATE_PROJECT, UPDATE_PROJECT_STAGE, SUBMIT_PROJECT, DELETE_PROJECT,
+    GET_PROJECTS, GET_PROJECT, CREATE_PROJECT, CREATE_PROJECT_FROM_TEMPLATE, UPDATE_PROJECT, UPDATE_PROJECT_STAGE, UPDATE_PROJECT_FEEDBACK, SUBMIT_PROJECT, DELETE_PROJECT,
     ADD_STUDENT, REMOVE_STUDENT
   }
 });

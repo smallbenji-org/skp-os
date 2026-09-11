@@ -91,6 +91,19 @@ export default class ProjectService {
     }
   }
 
+  public async updateProjectFeedback(id: number, feedback: string | null): Promise<ProjectDto | null> {
+    try {
+      const response: AxiosResponse<ProjectDto> = await api({
+        url: `/api/project/${id}/feedback`,
+        method: "PUT",
+        data: { feedback }
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
+
   public async deleteProject(id: number): Promise<boolean> {
     try {
       await api({

@@ -12,6 +12,7 @@ export interface ProjectDto {
     gitRepoUrl: string;
     isCustomProject: boolean;
     stage: ProjectStage;
+    feedback: string | null;
     projectTemplateId: number | null;
     projectTemplate: ProjectTemplateDto | null;
     students: StudentProfileDto[];

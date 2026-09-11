@@ -17,6 +17,7 @@ public class ProjectDto
         GitRepoUrl = project.GitRepoUrl;
         IsCustomProject = project.IsCustomProject;
         Stage = project.Stage;
+        Feedback = project.Feedback;
         ProjectTemplateId = project.ProjectTemplateId;
         ProjectTemplate = project.ProjectTemplate != null ? new ProjectTemplateDto(project.ProjectTemplate) : null;
     }
@@ -30,6 +31,7 @@ public class ProjectDto
     public string GitRepoUrl { get; set; } = string.Empty;
     public bool IsCustomProject { get; set; }
     public ProjectStage Stage { get; set; }
+    public string? Feedback { get; set; }
     public int? ProjectTemplateId { get; set; }
     public ProjectTemplateDto? ProjectTemplate { get; set; }
     public List<StudentProfileDto> Students { get; set; } = [];
@@ -47,6 +49,11 @@ public class CreateProjectDto
 public class UpdateProjectStageDto
 {
     public ProjectStage Stage { get; set; }
+}
+
+public class UpdateProjectFeedbackDto
+{
+    public string? Feedback { get; set; }
 }
 
 public class UpdateProjectDto
