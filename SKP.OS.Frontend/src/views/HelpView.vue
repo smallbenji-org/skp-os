@@ -32,8 +32,8 @@ const sections: HelpSection[] = [
   {
     summary: "Projekter",
     body: [
-      "Under 'Mine Projekter' kan du oprette dine egne projekter og koble dem til en template.",
-      "Under 'SKP Projekter' kan du se skolepraktik-projekter du er tilknyttet.",
+      "Under 'SKP Projekter' kan du se skabeloner og oprette dit eget projekt ud fra en skabelon.",
+      "Projektet oprettes og vises under 'Mine Projekter', hvor du kan se de projekter du er tilknyttet.",
       "Du kan tilføje din Git-repo, så din underviser kan hjælpe med gennemgang og evaluering.",
     ],
   },

@@ -40,6 +40,18 @@ export default class ProjectService {
     }
   }
 
+  public async createProjectFromTemplate(templateId: number): Promise<ProjectDto | null> {
+    try {
+      const response: AxiosResponse<ProjectDto> = await api({
+        url: `/api/project/from-template/${templateId}`,
+        method: "POST"
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
+
   public async updateProject(id: number, data: UpdateProjectDto): Promise<ProjectDto | null> {
     try {
       const response: AxiosResponse<ProjectDto> = await api({

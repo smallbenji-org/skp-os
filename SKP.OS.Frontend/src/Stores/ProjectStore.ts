@@ -32,6 +32,14 @@ export const useProjectStore = defineStore("project", () => {
     return created;
   }
 
+  async function CREATE_PROJECT_FROM_TEMPLATE(templateId: number) {
+    const created = await projectService.createProjectFromTemplate(templateId);
+    if (created) {
+      await GET_PROJECTS();
+    }
+    return created;
+  }
+
   async function UPDATE_PROJECT(id: number, data: UpdateProjectDto) {
     const updated = await projectService.updateProject(id, data);
     if (updated) {
@@ -68,7 +76,7 @@ export const useProjectStore = defineStore("project", () => {
   return {
     Projects, SelectedProject,
     PROJECTS, SELECTED_PROJECT,
-    GET_PROJECTS, GET_PROJECT, CREATE_PROJECT, UPDATE_PROJECT, DELETE_PROJECT,
+    GET_PROJECTS, GET_PROJECT, CREATE_PROJECT, CREATE_PROJECT_FROM_TEMPLATE, UPDATE_PROJECT, DELETE_PROJECT,
     ADD_STUDENT, REMOVE_STUDENT
   }
 });

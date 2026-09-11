@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKP.OS.Backend.Dtos;
@@ -13,10 +14,12 @@ namespace SKP.OS.Backend.Controllers;
 public class ProjectController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public ProjectController(ApplicationDbContext context)
+    public ProjectController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     /// <summary>Lists all projects.</summary>
@@ -97,6 +100,56 @@ public class ProjectController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new ProjectDto(project));
+    }
+
+    /// <summary>Creates a new project from a project template and assigns the current user.</summary>
+    /// <remarks>
+    /// Copies the template's title, description and repository into a new project linked to the
+    /// template, then automatically assigns the current user's student profile to it.
+    /// <para>Returns 404 if the template does not exist, 404 if the current user has no student profile.</para>
+    /// </remarks>
+    /// <param name="templateId">The id of the project template to copy.</param>
+    [HttpPost("from-template/{templateId:int}")]
+    public async Task<IActionResult> CreateFromTemplate(int templateId)
+    {
+        var template = await _context.ProjectTemplates
+            .FirstOrDefaultAsync(pt => pt.Id == templateId);
+        if (template == null)
+        {
+            return NotFound(new { message = "Project template not found." });
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var student = await _context.StudentProfiles
+            .Include(sp => sp.User)
+            .FirstOrDefaultAsync(sp => sp.ApplicationUserId == user.Id);
+        if (student == null)
+        {
+            return NotFound(new { message = "No student profile found for current user." });
+        }
+
+        var project = new Project
+        {
+            Title = template.Title,
+            ShortDescription = template.ShortDescription,
+            GitRepoUrl = template.GitRepoUrl,
+            IsCustomProject = false,
+            ProjectTemplateId = template.Id,
+            Students = [student]
+        };
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+
+        var dto = new ProjectDto(project)
+        {
+            Students = project.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? []
+        };
+        return Ok(dto);
     }
 
     /// <summary>Updates an existing project.</summary>
