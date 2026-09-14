@@ -2,9 +2,9 @@ import type { ProjectStage } from "@/types";
 
 export const STAGE_LABELS: Record<ProjectStage, string> = {
   Created: "Oprettet",
-  Approved: "Godkendt",
-  Submitted: "Afleveret",
-  Evaluated: "Evalueret",
+  Approved: "I gang",
+  Submitted: "Afventer evaluering",
+  Evaluated: "Afsluttet",
 };
 
 export const STAGE_ORDER: ProjectStage[] = [

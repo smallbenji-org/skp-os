@@ -14,7 +14,6 @@ const cls = computed(() => stageClass(props.stage));
 
 <template>
   <span class="stage-badge" :class="[cls, size ?? 'md']">
-    <span class="dot" />
     {{ label }}
   </span>
 </template>
@@ -25,60 +24,69 @@ const cls = computed(() => stageClass(props.stage));
   align-items: center;
   gap: 6px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
+  letter-spacing: 0.1px;
 }
 
 .stage-badge .dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .stage-badge.md {
-  padding: 4px 10px;
+  padding: 3px 9px;
   font-size: 11.5px;
 }
 
 .stage-badge.sm {
-  padding: 2px 8px;
+  padding: 2px 7px;
   font-size: 10.5px;
 }
 
+/* Oprettet: neutral blue/gray */
 .stage-badge.stage-created {
   background: #f1f5f9;
   color: #475569;
+  border: 1px solid #e2e8f0;
 }
 
 .stage-badge.stage-created .dot {
-  background: #94a3b8;
+  background: #64748b;
 }
 
+/* I gang: blue accent */
 .stage-badge.stage-approved {
   background: #eff6ff;
   color: #1d4ed8;
+  border: 1px solid #dbeafe;
 }
 
 .stage-badge.stage-approved .dot {
-  background: #3b82f6;
+  background: #2563eb;
 }
 
+/* Afventer evaluering: warm amber */
 .stage-badge.stage-submitted {
   background: #fffbeb;
   color: #b45309;
+  border: 1px solid #fef3c7;
 }
 
 .stage-badge.stage-submitted .dot {
   background: #f59e0b;
 }
 
+/* Afsluttet: muted emerald/green */
 .stage-badge.stage-evaluated {
-  background: #ecfdf5;
-  color: #065f46;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce7;
 }
 
 .stage-badge.stage-evaluated .dot {
-  background: #10b981;
+  background: #16a34a;
 }
 </style>
