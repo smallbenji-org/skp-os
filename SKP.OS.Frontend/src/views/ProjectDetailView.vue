@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   IconArrowLeft,
@@ -27,7 +27,7 @@ const projectStore = useProjectStore();
 const authStore = useAuthStore();
 const studentProfileStore = useStudentProfileStore();
 
-const projectId = Number(route.params.id);
+const projectId = computed(() => Number(route.params.id));
 
 const isLoading = ref(true);
 const notFound = ref(false);
@@ -102,13 +102,22 @@ function applyProject() {
 }
 
 async function load() {
-  await projectStore.GET_PROJECT(projectId);
+  await projectStore.GET_PROJECT(projectId.value);
   if (projectStore.SELECTED_PROJECT == null) {
     notFound.value = true;
   } else {
     applyProject();
   }
 }
+
+watch(
+  () => route.params.id,
+  async (newId) => {
+    if (newId) {
+      await load();
+    }
+  }
+);
 
 function startEdit() {
   applyProject();
@@ -224,9 +233,7 @@ function goBack() {
 
 onMounted(async () => {
   try {
-    if (isStudent.value) {
-      await studentProfileStore.GET_MY_STUDENT_PROFILE();
-    }
+    await studentProfileStore.GET_MY_STUDENT_PROFILE();
     await load();
   } finally {
     isLoading.value = false;

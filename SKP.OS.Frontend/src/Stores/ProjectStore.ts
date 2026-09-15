@@ -43,8 +43,11 @@ export const useProjectStore = defineStore("project", () => {
   async function UPDATE_PROJECT(id: number, data: UpdateProjectDto) {
     const updated = await projectService.updateProject(id, data);
     if (updated) {
-      await GET_PROJECTS();
+      if ((!updated.students || updated.students.length === 0) && SelectedProject.value?.students?.length) {
+        updated.students = SelectedProject.value.students;
+      }
       SelectedProject.value = updated;
+      await Promise.all([GET_PROJECTS(), GET_PROJECT(id)]);
     }
     return updated;
   }
@@ -52,8 +55,11 @@ export const useProjectStore = defineStore("project", () => {
   async function UPDATE_PROJECT_STAGE(id: number, stage: ProjectStage) {
     const updated = await projectService.updateProjectStage(id, stage);
     if (updated) {
-      await GET_PROJECTS();
+      if ((!updated.students || updated.students.length === 0) && SelectedProject.value?.students?.length) {
+        updated.students = SelectedProject.value.students;
+      }
       SelectedProject.value = updated;
+      await Promise.all([GET_PROJECTS(), GET_PROJECT(id)]);
     }
     return updated;
   }
@@ -61,8 +67,11 @@ export const useProjectStore = defineStore("project", () => {
   async function SUBMIT_PROJECT(id: number, data: UpdateProjectDto) {
     const updated = await projectService.submitProject(id, data);
     if (updated) {
-      await GET_PROJECTS();
+      if ((!updated.students || updated.students.length === 0) && SelectedProject.value?.students?.length) {
+        updated.students = SelectedProject.value.students;
+      }
       SelectedProject.value = updated;
+      await Promise.all([GET_PROJECTS(), GET_PROJECT(id)]);
     }
     return updated;
   }
@@ -70,8 +79,11 @@ export const useProjectStore = defineStore("project", () => {
   async function UPDATE_PROJECT_FEEDBACK(id: number, feedback: string | null) {
     const updated = await projectService.updateProjectFeedback(id, feedback);
     if (updated) {
-      await GET_PROJECTS();
+      if ((!updated.students || updated.students.length === 0) && SelectedProject.value?.students?.length) {
+        updated.students = SelectedProject.value.students;
+      }
       SelectedProject.value = updated;
+      await Promise.all([GET_PROJECTS(), GET_PROJECT(id)]);
     }
     return updated;
   }

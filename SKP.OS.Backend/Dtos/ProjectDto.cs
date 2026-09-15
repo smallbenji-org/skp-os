@@ -20,6 +20,7 @@ public class ProjectDto
         Feedback = project.Feedback;
         ProjectTemplateId = project.ProjectTemplateId;
         ProjectTemplate = project.ProjectTemplate != null ? new ProjectTemplateDto(project.ProjectTemplate) : null;
+        Students = project.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? [];
     }
 
     public int Id { get; set; }

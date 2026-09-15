@@ -164,7 +164,7 @@ public class ProjectController : ControllerBase
     {
         var project = await _context.Projects
             .Include(p => p.ProjectTemplate)
-            .Include(p => p.Students)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
@@ -260,6 +260,7 @@ public class ProjectController : ControllerBase
     {
         var project = await _context.Projects
             .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
@@ -291,6 +292,7 @@ public class ProjectController : ControllerBase
     {
         var project = await _context.Projects
             .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
@@ -370,7 +372,8 @@ public class ProjectController : ControllerBase
     public async Task<IActionResult> AddStudent(int id, int studentId)
     {
         var project = await _context.Projects
-            .Include(p => p.Students)
+            .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
@@ -407,7 +410,8 @@ public class ProjectController : ControllerBase
     public async Task<IActionResult> RemoveStudent(int id, int studentId)
     {
         var project = await _context.Projects
-            .Include(p => p.Students)
+            .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
