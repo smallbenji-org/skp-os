@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ApplicationDbContext _context;
 
-    private static readonly string[] AllowedRoles = { "Student", "Instructor" };
+    private static readonly string[] AllowedRoles = ["Student", "Instructor"];
 
     public AuthController(
         UserManager<ApplicationUser> userManager,
@@ -140,7 +140,7 @@ public class AuthController : ControllerBase
         {
             Name = user.Name ?? string.Empty,
             Email = user.Email ?? string.Empty,
-            Roles = roles.ToList()
+            Roles = [.. roles]
         });
     }
 
@@ -160,7 +160,7 @@ public class AuthController : ControllerBase
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        return Ok(new RolesDto { Roles = roles.ToList() });
+        return Ok(new RolesDto { Roles = [.. roles] });
     }
 
     /// <summary>TEMPORARY: Grants the current user the Instructor role.</summary>
