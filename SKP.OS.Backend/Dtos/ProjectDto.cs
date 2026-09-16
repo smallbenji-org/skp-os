@@ -68,3 +68,10 @@ public class UpdateProjectDto
     public bool IsCustomProject { get; set; }
     public int? ProjectTemplateId { get; set; }
 }
+
+public class CreatePersonalProjectDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string ShortDescription { get; set; } = string.Empty;
+    public string GitRepoUrl { get; set; } = string.Empty;
+}

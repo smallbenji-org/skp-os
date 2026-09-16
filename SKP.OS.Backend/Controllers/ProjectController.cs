@@ -343,6 +343,76 @@ public class ProjectController : ControllerBase
             .FirstOrDefaultAsync(sp => sp.ApplicationUserId == user.Id);
     }
 
+    /// <summary>Lists all personal projects for the current user.</summary>
+    /// <remarks>Returns only custom projects (IsCustomProject = true) assigned to the current user's student profile.</remarks>
+    [HttpGet("personal")]
+    public async Task<IActionResult> GetPersonalProjects()
+    {
+        var student = await CurrentUserStudent();
+        if (student == null)
+        {
+            return NotFound(new { message = "No student profile found for current user." });
+        }
+
+        var projects = await _context.Projects
+            .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
+            .Where(p => p.IsCustomProject && p.Students.Any(s => s.Id == student.Id))
+            .OrderBy(p => p.Title)
+            .ToListAsync();
+
+        return Ok(projects.Select(p => new ProjectDto(p)
+        {
+            Students = p.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? []
+        }));
+    }
+
+    /// <summary>Creates a new personal project for the current user.</summary>
+    /// <remarks>
+    /// Creates a custom project (IsCustomProject = true) and automatically assigns the current user's student profile.
+    /// <para>Returns 404 if the current user has no student profile.</para>
+    /// </remarks>
+    [HttpPost("personal")]
+    public async Task<IActionResult> CreatePersonalProject([FromBody] CreatePersonalProjectDto dto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var student = await _context.StudentProfiles
+            .Include(sp => sp.User)
+            .FirstOrDefaultAsync(sp => sp.ApplicationUserId == user.Id);
+        if (student == null)
+        {
+            return NotFound(new { message = "No student profile found for current user." });
+        }
+
+        var project = new Project
+        {
+            Title = dto.Title,
+            ShortDescription = dto.ShortDescription,
+            GitRepoUrl = dto.GitRepoUrl,
+            IsCustomProject = true,
+            ProjectTemplateId = null,
+            Students = [student]
+        };
+
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+
+        var createdProject = await _context.Projects
+            .Include(p => p.ProjectTemplate)
+            .Include(p => p.Students).ThenInclude(s => s.User)
+            .FirstOrDefaultAsync(p => p.Id == project.Id);
+
+        return Ok(new ProjectDto(createdProject!)
+        {
+            Students = createdProject!.Students?.Select(s => new StudentProfileDto(s)).ToList() ?? []
+        });
+    }
+
     /// <summary>Deletes a project.</summary>
     /// <remarks>Returns 404 if the project does not exist, otherwise 204 on success.</remarks>
     /// <param name="id">The id of the project.</param>
