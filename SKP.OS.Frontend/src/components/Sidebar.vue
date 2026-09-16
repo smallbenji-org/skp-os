@@ -12,11 +12,22 @@ import {
   IconInbox, 
   IconInfoCircle, 
   IconSchool,
-  IconSettings
+  IconSettings,
+  IconHelp
 } from '@tabler/icons-vue'
 import { useAuthStore } from '@/Stores/AuthStore'
 
 const isCollapsed = defineModel<boolean>('collapsed', { default: false })
+
+withDefaults(defineProps<{
+  isMobileOpen?: boolean
+}>(), {
+  isMobileOpen: false
+})
+
+const emit = defineEmits<{
+  (e: 'close-mobile'): void
+}>()
 
 const route = useRoute()
 const router = useRouter()
@@ -37,7 +48,13 @@ const tabs = computed(() => {
   return list
 })
 
-const activeName = computed(() => (route.name as string) || 'forside')
+const activeName = computed(() => {
+  const current = (route.name as string) || 'forside'
+  if (current === 'projekt-detalje') {
+    return 'projekter'
+  }
+  return current
+})
 
 const sidebarRef = ref<HTMLElement | null>(null)
 const tabRefs = new Map<string, HTMLElement>()
@@ -113,7 +130,7 @@ onUnmounted(() => {
   <aside 
     ref="sidebarRef" 
     class="sidebar" 
-    :class="{ collapsed: isCollapsed }" 
+    :class="{ collapsed: isCollapsed, 'mobile-open': isMobileOpen }" 
     aria-label="Sidebar"
   >
     <div class="sidebar-header">
@@ -139,6 +156,7 @@ onUnmounted(() => {
         :class="{ active: activeName === tab.name }"
         :title="isCollapsed ? tab.label : undefined"
         :aria-label="tab.label"
+        @click="emit('close-mobile')"
       >
         <component :is="tab.icon" :size="20" :stroke-width="2" class="tab-icon" />
         <span class="tab-label">{{ tab.label }}</span>
@@ -154,6 +172,7 @@ onUnmounted(() => {
         :class="{ active: activeName === 'underviser' }"
         :title="isCollapsed ? 'Instruktør' : undefined"
         aria-label="Instruktør"
+        @click="emit('close-mobile')"
       >
         <IconSchool :size="20" :stroke-width="2" class="tab-icon" />
         <span class="tab-label">Instruktør</span>
@@ -165,6 +184,7 @@ onUnmounted(() => {
         :class="{ active: activeName === 'indstillinger' }"
         :title="isCollapsed ? 'Indstillinger' : undefined"
         aria-label="Indstillinger"
+        @click="emit('close-mobile')"
       >
         <IconSettings :size="20" :stroke-width="2" class="tab-icon" />
         <span class="tab-label">Indstillinger</span>
@@ -342,5 +362,25 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 6px;
   width: 100%;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    width: 260px !important;
+    z-index: 1000 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 24px 24px 0 !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
 }
 </style>

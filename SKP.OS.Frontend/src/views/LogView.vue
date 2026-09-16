@@ -22,7 +22,7 @@ const isSaving = ref(false);
 const saveStatus = ref<"idle" | "success" | "error">("idle");
 
 const INFO_EXPANDED_KEY = "logbook_info_expanded";
-const infoExpanded = ref(localStorage.getItem(INFO_EXPANDED_KEY) !== "false");
+const infoExpanded = ref(localStorage.getItem(INFO_EXPANDED_KEY) === "true");
 watchEffect(() => {
   localStorage.setItem(INFO_EXPANDED_KEY, String(infoExpanded.value));
 });

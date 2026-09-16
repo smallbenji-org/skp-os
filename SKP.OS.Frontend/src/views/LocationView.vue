@@ -43,7 +43,7 @@ function showToast(message: string, type: "success" | "warning" | "info" = "succ
 }
 
 const INFO_EXPANDED_KEY = "location_info_expanded";
-const infoExpanded = ref(localStorage.getItem(INFO_EXPANDED_KEY) !== "false");
+const infoExpanded = ref(localStorage.getItem(INFO_EXPANDED_KEY) === "true");
 watchEffect(() => {
   localStorage.setItem(INFO_EXPANDED_KEY, String(infoExpanded.value));
 });
@@ -732,7 +732,7 @@ onMounted(async () => {
 
 .locations-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 14px;
 }
 
@@ -782,28 +782,27 @@ onMounted(async () => {
 .card-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
+  flex: 1;
 }
 
 .pin-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #fee2e2;
-  color: #dc2626;
+  color: #ef4444;
   flex-shrink: 0;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.pin-badge.active {
-  background: #b3ffce;
-  color: #16a34a;
+.location-card.selected .pin-badge {
+  background: #dcfce7;
+  color: #22c55e;
 }
 
 .card-texts {
@@ -811,26 +810,23 @@ onMounted(async () => {
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  flex: 1;
 }
 
 .card-title {
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 700;
   color: #111827;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
 .card-subtitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #4b5563;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
 .card-selected-badge {

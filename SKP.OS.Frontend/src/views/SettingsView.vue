@@ -71,8 +71,10 @@ onMounted(async () => {
 
       <div class="surface note-surface">
         <p class="note-text">
-          Kontakt din underviser hvis dine oplysninger skal ændres, eller hvis du har brug for hjælp med at
-          logge ind. Adgangskode og brugernavn kan ikke ændres her.
+          {{ isStudent && !authStore.HAS_ROLE('Instructor')
+              ? 'Kontakt din underviser hvis dine oplysninger skal ændres, eller hvis du har brug for hjælp med at logge ind. Adgangskode og brugernavn kan ikke ændres her.'
+              : 'Kontakt systemadministratoren hvis dine oplysninger skal ændres. Adgangskode og brugernavn kan ikke ændres her.'
+          }}
         </p>
       </div>
     </template>

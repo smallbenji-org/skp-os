@@ -286,7 +286,7 @@ const handleRegister = async () => {
                     v-model="registerForm.name"
                     type="text"
                     class="form-input"
-                    placeholder="F.eks. Mikkel Martin Larsen"
+                    placeholder="F.eks. Fornavn Efternavn"
                     autocomplete="name"
                     required
                     :disabled="loading"

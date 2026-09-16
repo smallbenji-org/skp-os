@@ -996,6 +996,7 @@ onMounted(async () => {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .data-table {
@@ -1018,38 +1019,49 @@ onMounted(async () => {
 }
 
 .col-created {
-  width: 190px;
+  width: 22%;
+  min-width: 130px;
 }
 .col-earned {
-  width: 110px;
+  width: 13%;
+  min-width: 80px;
 }
 .col-used {
-  width: 110px;
+  width: 13%;
+  min-width: 80px;
 }
 .col-valid-from {
-  width: 150px;
+  width: 16%;
+  min-width: 95px;
 }
 .col-valid-to {
-  width: 150px;
+  width: 16%;
+  min-width: 95px;
 }
 .col-note {
-  min-width: 160px;
+  width: 20%;
+  min-width: 110px;
 }
 
 .col-instructor-created {
-  width: 190px;
+  width: 20%;
+  min-width: 130px;
 }
 .col-period {
-  width: 250px;
+  width: 26%;
+  min-width: 140px;
 }
 .col-duration {
-  width: 110px;
+  width: 14%;
+  min-width: 80px;
 }
 .col-category {
-  width: 180px;
+  width: 18%;
+  min-width: 100px;
 }
 .col-instructor-note {
-  min-width: 160px;
+  width: 22%;
+  min-width: 110px;
 }
 
 .table-row {

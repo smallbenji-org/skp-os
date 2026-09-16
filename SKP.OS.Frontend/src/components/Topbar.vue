@@ -6,7 +6,7 @@ withDefaults(defineProps<{
   userName?: string
 }>(), {
   isSidebarCollapsed: false,
-  userName: 'Mikkel Martin Larsen'
+  userName: 'Bruger'
 })
 
 const emit = defineEmits<{
@@ -222,6 +222,22 @@ const emit = defineEmits<{
 
 .logout-icon {
   flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .collapse-toggle-btn {
+    margin-left: 0 !important;
+  }
+
+  .topbar {
+    padding: 0 10px;
+  }
+
+  .profile-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>
 

@@ -14,6 +14,7 @@ const isLoading = ref(true);
 const creatingId = ref<number | null>(null);
 const feedback = ref<"idle" | "success" | "error">("idle");
 const feedbackTemplate = ref<string>("");
+const lastCreatedId = ref<number | null>(null);
 
 const isStudent = computed(() => authStore.HAS_ROLE("Student"));
 
@@ -47,13 +48,14 @@ async function createFromTemplate(template: ProjectTemplateDto) {
   creatingId.value = null;
   if (created) {
     feedback.value = "success";
+    lastCreatedId.value = created.id;
   } else {
     feedback.value = "error";
     feedbackTemplate.value = template.title;
   }
   window.setTimeout(() => {
     feedback.value = "idle";
-  }, 4000);
+  }, 6000);
 }
 
 onMounted(async () => {
@@ -115,25 +117,43 @@ onMounted(async () => {
         >
           <IconPlus v-if="creatingId !== template.id" :size="15" :stroke-width="2.5" />
           <span v-else class="spinner" />
-          {{ creatingId === template.id ? "Opretter…" : "Opret projekt" }}
+          {{ creatingId === template.id ? "Starter…" : "Vælg skabelon" }}
         </button>
       </article>
     </div>
 
-    <span
+    <div
       v-if="feedback === 'success'"
-      class="save-feedback success"
+      class="save-feedback-banner success"
     >
-      <IconCheck :size="13" :stroke-width="2.5" />
-      Projektet er oprettet og ligger nu under "Mine Projekter".
-    </span>
-    <span
+      <div class="banner-left">
+        <IconCheck :size="16" :stroke-width="2.5" />
+        <span>Projektet er oprettet og ligger nu under "Mine Projekter".</span>
+      </div>
+      <RouterLink
+        v-if="lastCreatedId"
+        :to="{ name: 'projekt-detalje', params: { id: lastCreatedId } }"
+        class="banner-link"
+      >
+        Åbn projekt →
+      </RouterLink>
+      <RouterLink
+        v-else
+        :to="{ name: 'projekter' }"
+        class="banner-link"
+      >
+        Gå til mine projekter →
+      </RouterLink>
+    </div>
+    <div
       v-else-if="feedback === 'error'"
-      class="save-feedback error"
+      class="save-feedback-banner error"
     >
-      <IconAlertTriangle :size="13" :stroke-width="2" />
-      Projektet kunne ikke oprettes. Prøv igen.
-    </span>
+      <div class="banner-left">
+        <IconAlertTriangle :size="16" :stroke-width="2" />
+        <span>Projektet kunne ikke oprettes. Prøv igen.</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -310,20 +330,46 @@ onMounted(async () => {
   }
 }
 
-.save-feedback {
-  display: inline-flex;
+.save-feedback-banner {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 13px;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 13.5px;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.save-feedback.success {
-  color: #059669;
+.save-feedback-banner.success {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  color: #166534;
 }
 
-.save-feedback.error {
-  color: #dc2626;
+.save-feedback-banner.error {
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  color: #991b1b;
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.banner-link {
+  color: #016bff;
+  text-decoration: underline;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.banner-link:hover {
+  color: #0052cc;
 }
 
 .empty {

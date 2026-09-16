@@ -1,22 +1,48 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import Topbar from '@/components/Topbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import { useAuthStore } from '@/Stores/AuthStore'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const isSidebarCollapsed = ref(false)
+const isMobileOpen = ref(false)
+const isMobile = ref(false)
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 900
+}
+
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
+})
+
+watch(() => route.path, () => {
+  isMobileOpen.value = false
+})
 
 const toggleSidebar = () => {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value
+  if (isMobile.value) {
+    isMobileOpen.value = !isMobileOpen.value
+  } else {
+    isSidebarCollapsed.value = !isSidebarCollapsed.value
+  }
 }
 
 const handleProfileClick = () => {
   if (authStore.HAS_ROLE('Student')) {
     router.push({ name: 'profil' })
+  } else {
+    router.push({ name: 'indstillinger' })
   }
 }
 
@@ -28,7 +54,16 @@ const handleLogout = async () => {
 
 <template>
   <main class="main-page" role="main">
-    <Sidebar v-model:collapsed="isSidebarCollapsed" />
+    <div
+      v-if="isMobileOpen"
+      class="sidebar-backdrop"
+      @click="isMobileOpen = false"
+    />
+    <Sidebar
+      v-model:collapsed="isSidebarCollapsed"
+      :is-mobile-open="isMobileOpen"
+      @close-mobile="isMobileOpen = false"
+    />
     <div class="app-body">
       <Topbar
         :is-sidebar-collapsed="isSidebarCollapsed"
@@ -38,9 +73,11 @@ const handleLogout = async () => {
         @logout="handleLogout"
       />
       <div class="content-area" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
-        <Transition name="fade" mode="out-in">
-          <RouterView :key="$route.name" />
-        </Transition>
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" :key="$route.name" />
+          </transition>
+        </router-view>
       </div>
     </div>
   </main>
@@ -55,6 +92,14 @@ const handleLogout = async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 99;
 }
 
 .app-body {
@@ -75,6 +120,15 @@ const handleLogout = async () => {
 
 .content-area.sidebar-collapsed {
   margin-left: 72px;
+}
+
+@media (max-width: 900px) {
+  .content-area {
+    margin-left: 0 !important;
+    padding: 16px 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .fade-enter-active,

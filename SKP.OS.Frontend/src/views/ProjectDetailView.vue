@@ -223,11 +223,27 @@ function formatStudentType(type?: string | null): string {
   return map[type] ?? type;
 }
 
-function goBack() {
+const backTarget = computed(() => {
+  if (route.query.from === "underviser") {
+    return { name: "underviser", label: "Tilbage til instruktøroversigt" };
+  }
+  if (route.query.from === "projekter") {
+    return { name: "projekter", label: "Tilbage til mine projekter" };
+  }
+  if (isStudent.value && isMyProject()) {
+    return { name: "projekter", label: "Tilbage til mine projekter" };
+  }
   if (isInstructor.value) {
-    router.push({ name: "underviser" });
+    return { name: "underviser", label: "Tilbage til instruktøroversigt" };
+  }
+  return { name: "projekter", label: "Tilbage til projekter" };
+});
+
+function goBack() {
+  if (window.history.length > 1 && route.query.from) {
+    router.back();
   } else {
-    router.push({ name: "projekter" });
+    router.push({ name: backTarget.value.name });
   }
 }
 
@@ -246,7 +262,7 @@ onMounted(async () => {
     <nav class="top-nav" aria-label="Brødkrummer">
       <button class="back-link-btn" type="button" @click="goBack">
         <IconArrowLeft :size="16" :stroke-width="2.2" />
-        <span>{{ isInstructor ? "Tilbage til underviser" : "Mine Projekter" }}</span>
+        <span>{{ backTarget.label }}</span>
       </button>
     </nav>
 

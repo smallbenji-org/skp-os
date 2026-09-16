@@ -1581,6 +1581,12 @@ onMounted(async () => {
   gap: 6px;
   padding: 14px 18px 0;
   border-bottom: 1px solid #dde1e5;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -1597,6 +1603,8 @@ onMounted(async () => {
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -1611,6 +1619,19 @@ onMounted(async () => {
 
 .tab-panel {
   padding: 22px 22px 26px;
+  overflow-x: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .section-heading {
