@@ -12,8 +12,7 @@ import {
   IconInbox, 
   IconInfoCircle, 
   IconSchool,
-  IconSettings,
-  IconHelp
+  IconSettings
 } from '@tabler/icons-vue'
 import { useAuthStore } from '@/Stores/AuthStore'
 
@@ -241,7 +240,6 @@ onUnmounted(() => {
   font-size: 1.25rem;
   font-weight: 800;
   color: #1a1a1a;
-  letter-spacing: -0.5px;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;

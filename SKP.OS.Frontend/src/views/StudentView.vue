@@ -315,7 +315,6 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
@@ -390,7 +389,6 @@ onMounted(async () => {
   font-size: 18px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.3px;
 }
 
 .profile-email {
@@ -524,8 +522,6 @@ onMounted(async () => {
   font-size: 12px;
   font-weight: 700;
   color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
   margin-bottom: 12px;
 }
 

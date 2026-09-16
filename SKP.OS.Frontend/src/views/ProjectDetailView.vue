@@ -277,7 +277,7 @@ onMounted(async () => {
     </div>
 
     <template v-else-if="project">
-      <!-- Status & Notice Banners -->
+      
       <div v-if="locked" class="surface notice-banner">
         <IconCheck :size="16" :stroke-width="2.5" class="notice-icon" />
         <span>Projektet er afleveret og låst. Det kan ikke redigeres længere.</span>
@@ -320,9 +320,8 @@ onMounted(async () => {
         <span>Projektet kunne ikke afleveres</span>
       </div>
 
-      <!-- READ-ONLY PROJECT OVERVIEW (DEFAULT) -->
       <section v-if="!isEditing" class="project-view-layout">
-        <!-- Project Hero Card -->
+        
         <div class="surface project-hero-card">
           <div class="hero-top-row">
             <div class="hero-badges">
@@ -330,10 +329,11 @@ onMounted(async () => {
               <span
                 v-if="project.projectTemplate || project.isCustomProject"
                 class="category-tag"
+                :class="{ 'personal-tag': project.isCustomProject }"
               >
                 {{
                   project.isCustomProject
-                    ? "Eget projekt"
+                    ? "Personligt projekt"
                     : project.projectTemplate?.title
                 }}
               </span>
@@ -395,9 +395,8 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Overview Two-Column Grid -->
         <div class="overview-grid">
-          <!-- Left Column: Description -->
+          
           <div class="surface content-card">
             <div class="section-label">Projektbeskrivelse</div>
             <p class="description-body">
@@ -405,7 +404,6 @@ onMounted(async () => {
             </p>
           </div>
 
-          <!-- Right Column: Technical & Project Metadata -->
           <div class="surface content-card meta-card">
             <div class="section-label">Projektoplysninger</div>
             <dl class="info-list">
@@ -422,9 +420,9 @@ onMounted(async () => {
               </div>
 
               <div v-if="project.projectTemplate || project.isCustomProject" class="info-row">
-                <dt class="info-key">Skabelon</dt>
+                <dt class="info-key">Type</dt>
                 <dd class="info-val">
-                  {{ project.isCustomProject ? "Eget projekt" : project.projectTemplate?.title }}
+                  {{ project.isCustomProject ? "Personligt projekt" : project.projectTemplate?.title }}
                 </dd>
               </div>
 
@@ -455,7 +453,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Reflection / Evaluation Section -->
         <div class="surface reflection-card">
           <div class="section-header-row">
             <div>
@@ -517,7 +514,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Instructor Controls Section (for Instructors) -->
         <div v-if="isInstructor" class="surface instructor-card">
           <div class="instructor-card-top">
             <div>
@@ -612,7 +608,6 @@ onMounted(async () => {
         </div>
       </section>
 
-      <!-- EDIT MODE FORM -->
       <section v-else class="edit-layout">
         <div class="surface edit-card">
           <div class="edit-header">
@@ -625,7 +620,7 @@ onMounted(async () => {
           </div>
 
           <form class="edit-form" @submit.prevent="saveProject">
-            <!-- Section 1: Project Information -->
+            
             <div class="form-section">
               <h3 class="form-section-title">Projektoplysninger</h3>
 
@@ -669,7 +664,6 @@ onMounted(async () => {
 
             <div class="form-divider" />
 
-            <!-- Section 2: Reflection & Evaluation -->
             <div class="form-section">
               <h3 class="form-section-title">Projektrefleksion</h3>
 
@@ -710,7 +704,6 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- Form Actions -->
             <div class="form-actions-bar">
               <div class="actions-left">
                 <button
@@ -804,7 +797,6 @@ onMounted(async () => {
   }
 }
 
-/* Notice & Feedback Banners */
 .notice-banner {
   display: flex;
   align-items: center;
@@ -843,8 +835,6 @@ onMounted(async () => {
   font-size: 12px;
   font-weight: 700;
   color: #1d4ed8;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
 }
 
 .feedback-banner-text {
@@ -878,7 +868,6 @@ onMounted(async () => {
   border: 1px solid #fecaca;
 }
 
-/* Hero Section */
 .project-view-layout {
   display: flex;
   flex-direction: column;
@@ -921,6 +910,13 @@ onMounted(async () => {
   color: #475569;
   background-color: #f1f5f9;
   border: 1px solid #e2e8f0;
+}
+
+.category-tag.personal-tag {
+  color: #334155;
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  font-weight: 500;
 }
 
 .type-tag {
@@ -996,7 +992,6 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.4px;
   line-height: 1.3;
 }
 
@@ -1019,7 +1014,6 @@ onMounted(async () => {
   color: #94a3b8;
 }
 
-/* Two-column overview */
 .overview-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -1042,8 +1036,6 @@ onMounted(async () => {
   font-size: 11.5px;
   font-weight: 700;
   color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .description-body {
@@ -1106,7 +1098,6 @@ onMounted(async () => {
   font-weight: 400;
 }
 
-/* Reflection Section */
 .reflection-card {
   display: flex;
   flex-direction: column;
@@ -1126,7 +1117,6 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.2px;
 }
 
 .section-sub {
@@ -1209,7 +1199,6 @@ onMounted(async () => {
   font-style: italic;
 }
 
-/* Instructor Card */
 .instructor-card {
   display: flex;
   flex-direction: column;
@@ -1325,7 +1314,6 @@ onMounted(async () => {
   color: #dc2626;
 }
 
-/* Edit Mode Layout */
 .edit-layout {
   display: flex;
   flex-direction: column;
@@ -1372,8 +1360,6 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 700;
   color: #334155;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
 }
 
 .form-group {

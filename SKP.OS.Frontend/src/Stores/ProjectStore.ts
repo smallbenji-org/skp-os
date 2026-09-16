@@ -1,21 +1,37 @@
 import ProjectService from "@/Services/ProjectService";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import type { CreateProjectDto, ProjectDto, ProjectStage, UpdateProjectDto } from "@/types";
+import type { CreatePersonalProjectDto, CreateProjectDto, ProjectDto, ProjectStage, UpdateProjectDto } from "@/types";
 
 export const useProjectStore = defineStore("project", () => {
   const projectService = new ProjectService();
 
   const Projects = ref<ProjectDto[]>([]);
+  const PersonalProjects = ref<ProjectDto[]>([]);
   const SelectedProject = ref<ProjectDto | null>(null);
 
   const PROJECTS = computed(() => Projects.value);
+  const PERSONAL_PROJECTS = computed(() => PersonalProjects.value);
   const SELECTED_PROJECT = computed(() => SelectedProject.value);
 
   async function GET_PROJECTS() {
     const data = await projectService.getProjects();
     Projects.value = data;
     return data;
+  }
+
+  async function GET_PERSONAL_PROJECTS() {
+    const data = await projectService.getPersonalProjects();
+    PersonalProjects.value = data;
+    return data;
+  }
+
+  async function CREATE_PERSONAL_PROJECT(data: CreatePersonalProjectDto) {
+    const created = await projectService.createPersonalProject(data);
+    if (created) {
+      await Promise.all([GET_PROJECTS(), GET_PERSONAL_PROJECTS()]);
+    }
+    return created;
   }
 
   async function GET_PROJECT(id: number) {
@@ -113,9 +129,11 @@ export const useProjectStore = defineStore("project", () => {
   }
 
   return {
-    Projects, SelectedProject,
-    PROJECTS, SELECTED_PROJECT,
-    GET_PROJECTS, GET_PROJECT, CREATE_PROJECT, CREATE_PROJECT_FROM_TEMPLATE, UPDATE_PROJECT, UPDATE_PROJECT_STAGE, UPDATE_PROJECT_FEEDBACK, SUBMIT_PROJECT, DELETE_PROJECT,
+    Projects, PersonalProjects, SelectedProject,
+    PROJECTS, PERSONAL_PROJECTS, SELECTED_PROJECT,
+    GET_PROJECTS, GET_PERSONAL_PROJECTS, GET_PROJECT,
+    CREATE_PROJECT, CREATE_PROJECT_FROM_TEMPLATE, CREATE_PERSONAL_PROJECT,
+    UPDATE_PROJECT, UPDATE_PROJECT_STAGE, UPDATE_PROJECT_FEEDBACK, SUBMIT_PROJECT, DELETE_PROJECT,
     ADD_STUDENT, REMOVE_STUDENT
   }
 });

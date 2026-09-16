@@ -36,3 +36,10 @@ export interface UpdateProjectDto {
     isCustomProject: boolean;
     projectTemplateId: number | null;
 }
+
+export interface CreatePersonalProjectDto {
+    title: string;
+    shortDescription: string;
+    gitRepoUrl: string;
+}
+

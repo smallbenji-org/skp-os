@@ -193,7 +193,6 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.5px;
   margin: 0;
 }
 
@@ -273,8 +272,6 @@ onMounted(async () => {
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: #6b7280;
 }
 

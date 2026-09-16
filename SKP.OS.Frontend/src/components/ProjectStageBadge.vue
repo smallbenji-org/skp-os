@@ -26,7 +26,6 @@ const cls = computed(() => stageClass(props.stage));
   border-radius: 999px;
   font-weight: 600;
   white-space: nowrap;
-  letter-spacing: 0.1px;
 }
 
 .stage-badge .dot {

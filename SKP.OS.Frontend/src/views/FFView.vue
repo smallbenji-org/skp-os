@@ -828,7 +828,6 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.2px;
 }
 
 .balance-badge {

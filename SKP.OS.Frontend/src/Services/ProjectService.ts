@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import type { CreateProjectDto, ProjectDto, ProjectStage, UpdateProjectDto } from "@/types";
+import type { CreatePersonalProjectDto, CreateProjectDto, ProjectDto, ProjectStage, UpdateProjectDto } from "@/types";
 import { api } from "./api";
 
 export default class ProjectService {
@@ -9,7 +9,7 @@ export default class ProjectService {
         url: "/api/project",
         method: "GET"
       });
-      return response.data ? response.data : [];
+      return Array.isArray(response.data) ? response.data : [];
     } catch {
       return [];
     }
@@ -139,4 +139,30 @@ export default class ProjectService {
       return null;
     }
   }
+
+  public async getPersonalProjects(): Promise<ProjectDto[]> {
+    try {
+      const response: AxiosResponse<ProjectDto[]> = await api({
+        url: "/api/project/personal",
+        method: "GET"
+      });
+      return Array.isArray(response.data) ? response.data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  public async createPersonalProject(data: CreatePersonalProjectDto): Promise<ProjectDto | null> {
+    try {
+      const response: AxiosResponse<ProjectDto> = await api({
+        url: "/api/project/personal",
+        method: "POST",
+        data
+      });
+      return response.data ? response.data : null;
+    } catch {
+      return null;
+    }
+  }
 }
+

@@ -209,7 +209,6 @@ onMounted(async () => {
       }
     }
   } catch {
-    // Kunne ikke hente status – behandles som ikke tjekket ind.
   } finally {
     isLoading.value = false;
   }
@@ -406,7 +405,6 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
@@ -722,7 +720,6 @@ onMounted(async () => {
   font-size: 15px;
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.2px;
 }
 
 .locations-subtitle {

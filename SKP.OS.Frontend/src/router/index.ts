@@ -79,11 +79,6 @@ const router = createRouter({
           component: () => import('@/views/InfoView.vue'),
         },
         {
-          path: 'hjaelp',
-          name: 'hjaelp',
-          component: () => import('@/views/HelpView.vue'),
-        },
-        {
           path: 'indstillinger',
           name: 'indstillinger',
           component: () => import('@/views/SettingsView.vue'),

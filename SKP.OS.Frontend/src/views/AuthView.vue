@@ -402,7 +402,6 @@ const handleRegister = async () => {
   font-size: 24px;
   font-weight: 800;
   color: #1a1a1a;
-  letter-spacing: -0.5px;
   margin: 0;
 }
 
