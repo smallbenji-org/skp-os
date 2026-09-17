@@ -226,24 +226,7 @@ onMounted(async () => {
                 </span>
               </dd>
             </div>
-            <div class="info-row">
-              <dt>
-                <IconFolderOpen :size="15" :stroke-width="2" />
-                Fuldførte hauls
-              </dt>
-              <dd>
-                <template v-if="profile && profile.completedHauls.length > 0">
-                  <span
-                    v-for="haul in profile.completedHauls"
-                    :key="haul"
-                    class="haul-chip"
-                  >
-                    {{ haul }}
-                  </span>
-                </template>
-                <span v-else class="muted">Ingen</span>
-              </dd>
-            </div>
+            
           </dl>
         </div>
 
@@ -357,6 +340,7 @@ onMounted(async () => {
 
 .profile-card {
   padding: 22px;
+  height: 257px;
 }
 
 .profile-head {
@@ -484,7 +468,7 @@ onMounted(async () => {
 .stats-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
 }
 
 .stat-card {
